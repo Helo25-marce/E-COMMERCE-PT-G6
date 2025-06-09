@@ -1,0 +1,32 @@
+body, html {
+    height: 100%;
+}
+.hero {
+    background: url("marche.jpg") center center/cover no-repeat;
+    height: 100vh;
+    position: relative;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* flou noir semi-transparent */
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+}
+.categories {
+    margin-top: 60px;
+}
+.cat-btn {
+    min-width: 120px;
+    margin: 10px;
+}
+  
