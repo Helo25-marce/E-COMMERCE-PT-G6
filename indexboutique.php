@@ -1,107 +1,105 @@
 <?php
+session_start();
 include('connexion.php');
 
-// 1. Récupérer toutes les boutiques
+// Boutiques
 $boutiques = $conn->query("SELECT id, nom, logo FROM boutiques")->fetchAll(PDO::FETCH_ASSOC);
-
-// 2. Quelle boutique sélectionnée ?
 $boutique_id = isset($_GET['boutique_id']) ? intval($_GET['boutique_id']) : 0;
+$tri = $_GET['tri'] ?? '';
+// Sélection de la boutique choisie
 $boutique_selected = null;
-if ($boutique_id > 0) {
-    foreach ($boutiques as $b) {
-        if ($b['id'] == $boutique_id) $boutique_selected = $b;
-    }
+foreach ($boutiques as $b) {
+    if ($b['id'] == $boutique_id) $boutique_selected = $b;
 }
 
-// 3. Gestion du tri
-$tri = isset($_GET['tri']) ? $_GET['tri'] : 'recent';
-$orderBy = "date_ajout DESC";
-if ($tri === 'prix_asc') $orderBy = "prix ASC";
-elseif ($tri === 'prix_desc') $orderBy = "prix DESC";
+// Produits filtrés
+$query = "SELECT * FROM produits" . ($boutique_id ? " WHERE boutique_id = $boutique_id" : "");
+if ($tri == 'nouveaux') $query .= " ORDER BY date_ajout DESC";
+elseif ($tri == 'promo') $query .= ($boutique_id ? " AND" : " WHERE") . " est_promo = 1";
+elseif ($tri == 'prix') $query .= " ORDER BY prix ASC";
+$produits = $conn->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
-// 4. Récupérer les produits
-if ($boutique_id > 0) {
-    $stmt = $conn->prepare("SELECT * FROM produits WHERE boutique_id = ? ORDER BY $orderBy");
-    $stmt->execute([$boutique_id]);
-} else {
-    $stmt = $conn->query("SELECT * FROM produits ORDER BY $orderBy");
+// Ajout au panier (POST)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produit'])) {
+    $id = $_POST['id_produit'];
+    $nom = $_POST['nom'];
+    $prix = $_POST['prix'];
+    $image = $_POST['image_url'];
+    $quantite = intval($_POST['quantite']);
+    if (!isset($_SESSION['panier'])) $_SESSION['panier'] = [];
+    if (isset($_SESSION['panier'][$id])) $_SESSION['panier'][$id]['quantite'] += $quantite;
+    else $_SESSION['panier'][$id] = [
+        'nom' => $nom,
+        'prix' => $prix,
+        'image' => $image,
+        'quantite' => $quantite
+    ];
+    header("Location: panierB.php");
+    exit;
 }
-$produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Catalogue des Boutiques</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="StyleB.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 <div class="container">
-    <!-- Sélecteur de boutique + tri -->
-    <form method="get">
-        <label for="boutique_id"><b>Choisir une boutique :</b></label>
-        <select name="boutique_id" id="boutique_id" onchange="this.form.submit()">
-            <option value="0">-- Toutes les boutiques --</option>
+
+    <!-- Barre de filtre -->
+    <form method="get" class="filter-bar">
+        <label>Boutique :</label>
+        <select name="boutique_id" onchange="this.form.submit()">
+            <option value="0">Toutes les boutiques</option>
             <?php foreach ($boutiques as $b): ?>
                 <option value="<?= $b['id'] ?>" <?= ($boutique_id == $b['id']) ? 'selected' : '' ?>>
                     <?= htmlspecialchars($b['nom']) ?>
                 </option>
             <?php endforeach; ?>
         </select>
-
-        <label for="tri"><b>Trier par :</b></label>
-        <select name="tri" id="tri" onchange="this.form.submit()">
-            <option value="recent" <?= ($tri === 'recent') ? 'selected' : '' ?>>Nouveaux</option>
-            <option value="prix_asc" <?= ($tri === 'prix_asc') ? 'selected' : '' ?>>Prix croissant</option>
-            <option value="prix_desc" <?= ($tri === 'prix_desc') ? 'selected' : '' ?>>Prix décroissant</option>
+        <label>Trier par :</label>
+        <select name="tri" onchange="this.form.submit()">
+            <option value="">---</option>
+            <option value="prix" <?= ($tri == 'prix') ? 'selected' : '' ?>>Prix croissant</option>
+            <option value="nouveaux" <?= ($tri == 'nouveaux') ? 'selected' : '' ?>>Nouveaux</option>
+            <option value="promo" <?= ($tri == 'promo') ? 'selected' : '' ?>>Promotions</option>
         </select>
+        <a href="panierB.php" class="btn" style="margin-left:auto;">Voir le panier</a>
     </form>
 
-    <!-- Logo boutique -->
     <?php if ($boutique_selected): ?>
-        <div class="logo-boutique">
-            <img src="image/<?= htmlspecialchars($boutique_selected['logo']) ?>" alt="<?= htmlspecialchars($boutique_selected['nom']) ?>">
-            <h2><?= htmlspecialchars($boutique_selected['nom']) ?></h2>
+        <div class="header-boutique">
+            <img src="image/<?= htmlspecialchars($boutique_selected['logo']) ?>" alt="logo" class="logo">
+            <span class="nom-boutique"><?= htmlspecialchars($boutique_selected['nom']) ?></span>
         </div>
     <?php endif; ?>
 
-    <!-- Catalogue -->
-    <div class="catalogue-produits">
+    <!-- Catalogue produits centré -->
+    <div class="catalogue" style="justify-content:center;">
         <?php if (empty($produits)): ?>
-            <p>Aucun produit pour cette boutique.</p>
+            <p>Aucun produit trouvé.</p>
         <?php endif; ?>
         <?php foreach ($produits as $produit): ?>
-            <div class="card-produit">
-                <!-- Badge dynamique -->
-                <span class="badge"><?= $produit['est_promo'] ? 'Promo' : 'Nouveau' ?></span>
-
-                <!-- Image produit -->
-                <img src="images/<?= htmlspecialchars($produit['image_url']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>">
-
-                <!-- Informations -->
+            <div class="produit">
+                <?php if ($produit['est_promo']) echo "<span class='badge promo'>PROMO</span>"; ?>
+                <?php if (strtotime($produit['date_ajout']) > strtotime('-30 days')) echo "<span class='badge new'>NOUVEAU</span>"; ?>
+                <a href="detailB.php?id=<?= $produit['id'] ?>">
+                    <img src="images/<?= htmlspecialchars($produit['image_url']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" style="aspect-ratio:1.1/1;border-radius:18px;object-fit:cover;">
+                </a>
                 <h4><?= htmlspecialchars($produit['nom']) ?></h4>
                 <p><?= htmlspecialchars($produit['description']) ?></p>
                 <b><?= htmlspecialchars($produit['prix']) ?> FCFA</b>
-
-                <!-- Stock -->
-                <?php
-                    $stock = intval($produit['stock']);
-                    if ($stock <= 0) {
-                        $classe = "rupture";
-                        $texte = "En rupture de stock";
-                    } elseif ($stock <= 5) {
-                        $classe = "limite";
-                        $texte = "Stock limité";
-                    } else {
-                        $classe = "en-stock";
-                        $texte = "En stock";
-                    }
-                ?>
-                <div class="stock <?= $classe ?>"><?= $texte ?></div>
-
-                <!-- Lien détail -->
-                <a href="detail.php?id=<?= $produit['id_produit'] ?>" class="btn-detail">Voir détails</a>
+                <form method="post" style="margin-top:10px;">
+                    <input type="hidden" name="id_produit" value="<?= $produit['id'] ?>">
+                    <input type="hidden" name="nom" value="<?= htmlspecialchars($produit['nom']) ?>">
+                    <input type="hidden" name="prix" value="<?= $produit['prix'] ?>">
+                    <input type="hidden" name="image_url" value="<?= htmlspecialchars($produit['image_url']) ?>">
+                    <input type="number" name="quantite" value="1" min="1" style="width:50px;">
+                    <button type="submit" class="ajouter">Ajouter au panier</button>
+                </form>
             </div>
         <?php endforeach; ?>
     </div>
