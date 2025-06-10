@@ -1,39 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Accueil - E-commerce</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Shopping Cart</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>MaBoutique</h1>
-    <nav>
-      <button onclick="window.location.href='login.html'">Connexion</button>
-      <button onclick="window.location.href='register.html'">Inscription</button>
-      <button onclick="window.location.href='panier.html'">🛒 Panier</button>
-    </nav>
-  </header>
+  <h1>My Shopping Cart</h1>
+  <div id="cart"></div>
 
-  <section class="banniere">
-    <h2>Bienvenue dans notre site !</h2>
-    <p>Quel service voulez-vous aujourd'hui?</p>
-  </section>
-
-  <section id="categories">
-    <h2>Catégories</h2>
-    <div class="grid" id="categorie-list"></div>
-  </section>
-
-  <section id="produits">
-    <h2>Produits en vedette</h2>
-    <div class="grid" id="produit-list"></div>
-  </section>
-
-  <footer>
-    <p>&copy; 2025 MaBoutique - Tous droits réservés</p>
-  </footer>
+  <button onclick="goBack()">⬅ Go Back</button>
+  <button onclick="checkout()">✅ Checkout</button>
 
   <script src="script.js"></script>
 </body>
