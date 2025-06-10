@@ -11,7 +11,7 @@ $user = $_SESSION['utilisateur'];
 <html>
 <head>
     <title>Profil</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="inscription.css">
 </head>
 <body>
     <div class="form-container">

@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Connexion</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="inscriptions.css">
 </head>
 <body>
     <div class="form-container">
