@@ -17,7 +17,7 @@ if (!$produit) {
 <head>
     <meta charset="UTF-8">
     <title>Détail produit - <?= htmlspecialchars($produit['nom']) ?></title>
-    <link rel="stylesheet" href="inscription.css">
+    <link rel="stylesheet" href="StyleB.css">
 </head>
 <body>
 <div class="container">
