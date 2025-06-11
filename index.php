@@ -20,7 +20,7 @@ $cats = ['boucherie', 'poissonnerie', 'pharmacie', 'restaurant', 'boulangerie'];
 <html lang="<?= $lang ?>">
 <head>
   <meta charset="UTF-8">
-  <title>T~D | Tous à domicile</title>
+  <title>T~D | Tous à domicile: BHELMAR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="PT.css">
@@ -30,7 +30,7 @@ $cats = ['boucherie', 'poissonnerie', 'pharmacie', 'restaurant', 'boulangerie'];
 
   <!-- NAVIGATION -->
   <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
-    <a class="navbar-brand d-flex align-items-center" href="#">
+    <a class="navbar-brand d-flex align-items-center" href="index.php">
       <img src="logo.jpg" alt="Logo T~D" class="logo-img me-2">
       <span class="site-title">T~D <small class="subtitle">Tous à domicile</small></span>
     </a>
@@ -62,7 +62,6 @@ $cats = ['boucherie', 'poissonnerie', 'pharmacie', 'restaurant', 'boulangerie'];
       <p class="slogan-animated">Livraison rapide, produits frais, et service à votre porte !</p>
       <p class="mb-4 fs-5"><?= TXT_SUBTITLE ?></p>
 
-
       <form class="search-form" method="GET" action="recherche.php">
         <input type="text" name="q" class="form-control mb-3" placeholder="<?= TXT_PLACEHOLDER ?>">
         <select name="categorie" class="form-select mb-3">
@@ -80,17 +79,18 @@ $cats = ['boucherie', 'poissonnerie', 'pharmacie', 'restaurant', 'boulangerie'];
             <i class="fas fa-store me-1"></i> <?= $cat ?>
           </a>
         <?php endforeach; ?>
+        <a href="indexboutique.php" class="btn btn-outline-info mt-2"><i class="fas fa-store me-1"></i> Accès aux Boutiques</a>
       </div>
     </div>
   </section>
 
   <!-- PIED DE PAGE -->
   <footer class="text-center">
-  <h2>Contact</h2>
-        <p>Tel: 657558491</p>
-        <p>Email: <a href="mailto:heloisemarcellinepelagiekackka@gmail.com">heloïsemarcellinepelagiekackka@gmail.com</a> </p>
-        <p>LinkedIn | GitHub</p>
-    <p>&copy; 2025 <strong>T~D</strong> – Tous à domicile. <?= TXT_RIGHTS ?></p>
+    <h2>Contact</h2>
+    <p>Tel: 657558491</p>
+    <p>Email: <a href="mailto:heloisemarcellinepelagiekackka@gmail.com">heloïsemarcellinepelagiekackka@gmail.com</a></p>
+    <p>LinkedIn | GitHub</p>
+    <p>&copy; 2025 <strong>T~D</strong> – Tous à domicile: BHELMAR. <?= TXT_RIGHTS ?></p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
