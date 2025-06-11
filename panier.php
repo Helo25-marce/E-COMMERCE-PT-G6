@@ -7,7 +7,7 @@ require_once 'config.php';
 if (!isset($_SESSION['panier'])) {
     $_SESSION['panier'] = array();
 }
-
+c
 function getProductDetails($productId, $mysqli) {
     $sql = "SELECT id, name, price, image_url FROM products WHERE id = ?";
     if ($stmt = $mysqli->prepare($sql)) {
