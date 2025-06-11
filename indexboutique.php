@@ -44,7 +44,7 @@ try {
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center" href="index.php">
-      <img src="logo.jpg" alt="Logo BHELMAR" height="40">
+      <img src="Images.h/logobon.jpg" alt="Logo BHELMAR" height="40">
       <span>BHELMAR</span>
     </a>
   </div>
@@ -56,7 +56,7 @@ try {
     <?php foreach ($categories as $c): ?>
       <div class="col-md-4">
         <div class="card card-cat">
-          <img src="Images.h/logobon.jpg" 
+          <img src="image/" 
                alt="<?= htmlspecialchars($c['nom']) ?>">
           <div class="card-body text-center">
             <h5 class="card-title"><?= htmlspecialchars($c['nom']) ?></h5>
