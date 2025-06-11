@@ -21,7 +21,7 @@ $cats = ['boucherie','poissonnerie','pharmacie','restaurant','boulangerie'];
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body{background:url('hero.jpg')center/cover no-repeat;position:relative;margin:0;font-family:'Segoe UI',sans-serif;color:#fff;min-height:100vh}
+    body{background:url('Images.h/marche.jpg')center/cover no-repeat;position:relative;margin:0;font-family:'Segoe UI',sans-serif;color:#fff;min-height:100vh}
     body::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:0}
     .navbar,.hero-overlay,footer{position:relative;z-index:1}
     .custom-navbar{background:rgba(0,0,0,0.8)!important}
@@ -53,7 +53,7 @@ $cats = ['boucherie','poissonnerie','pharmacie','restaurant','boulangerie'];
 <nav class="navbar navbar-expand-lg custom-navbar">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center" href="index.php">
-      <img src="logo.jpg" class="logo-img me-2" alt="Logo">
+      <img src="Images.h/logobon.jpg" class="logo-img me-2" alt="Logo">
       <div><div class="site-title">BHELMAR</div><small class="subtitle">Tous à domicile</small></div>
     </a>
     <div class="ms-auto d-flex align-items-center">
