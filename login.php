@@ -5,10 +5,10 @@ require_once 'config.php';
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
-    $mot_de_passe = $_POST['mot_de_passe'];
+    $email = $_POST['email'] ?? '';
+    $mot_de_passe = $_POST['mot_de_passe'] ?? '';
 
-    $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE email = ?");
     $stmt->execute([$email]);
     $utilisateur = $stmt->fetch();
 
@@ -20,8 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($utilisateur['role'] === 'admin') {
             header("Location: admin/dashboard.php");
-        } elseif ($utilisateur['role'] === 'client') {
-            header("Location: welcome.php");
         } else {
             header("Location: welcome.php");
         }
@@ -37,24 +35,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Connexion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(120deg, #2980b9, #6dd5fa);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .card {
+            margin-top: 100px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.8);
+        }
+    </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-5">
+<body>
+    <div class="container">
         <div class="card mx-auto" style="max-width: 400px;">
             <div class="card-body">
-                <h2 class="card-title text-center">Connexion</h2>
+                <h2 class="card-title text-center mb-4">Connexion</h2>
                 <?php if ($message): ?>
                     <div class="alert alert-danger"><?= htmlspecialchars($message) ?></div>
                 <?php endif; ?>
                 <form method="POST" action="login.php">
-                       <input type="email" name="email" required>
-                         <input type="password" name="mot_de_passe" required>
-                         <button type="submit">Connexion</button>
-                </form>
-
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" id="email" class="form-control" required>
+                    </div>
                     <div class="mb-3">
                         <label for="mot_de_passe" class="form-label">Mot de passe</label>
-                        <input type="password" name="mot_de_passe" class="form-control" required>
+                        <input type="password" name="mot_de_passe" id="mot_de_passe" class="form-control" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Se connecter</button>
                 </form>
