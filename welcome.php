@@ -1,14 +1,24 @@
 <?php
 session_start();
-if (!isset($_SESSION['utilisateur'])) {
-    header("Location: login.php");
-    exit();
+
+if (!isset($_SESSION['utilisateur_id'])) {
+    header('Location: login.php');
+    exit;
 }
 ?>
-<h1>Bienvenue <?= htmlspecialchars($_SESSION['utilisateur']['prenom']) ?> !</h1>
-<ul>
-    <li><a href="indexboutique.php">Voir les boutiques</a></li>
-    <li><a href="profile.php">Mon profil</a></li>
-    <li><a href="panier.php">Voir mon panier</a></li>
-    <li><a href="logout.php">Se déconnecter</a></li>
-</ul>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenue</title>
+    <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+    <div class="welcome-box">
+        <h1>Bienvenue <?= htmlspecialchars($_SESSION['utilisateur_nom']) ?> !</h1>
+        <p>Votre rôle : <?= htmlspecialchars($_SESSION['utilisateur_role']) ?></p>
+        <p>Email : <?= htmlspecialchars($_SESSION['utilisateur_email']) ?></p>
+        <a href="logout.php" class="btn btn-danger">Déconnexion</a>
+    </div>
+</body>
+</html>
