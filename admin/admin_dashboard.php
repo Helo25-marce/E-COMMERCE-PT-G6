@@ -15,9 +15,14 @@ if (!isset($_SESSION['utilisateur_id']) || $_SESSION['utilisateur_role'] !== 'ad
 <body>
 <div class="container mt-5">
     <h1 class="text-center">Bienvenue Admin <?= htmlspecialchars($_SESSION['utilisateur_nom']) ?></h1>
+    <a href="gestion_utilisateurs.php">Gestion des utilisateurs</a>
+    <a href="gestion_produits.php">Gestion des produits</a>
+    <a href="gestion_commandes.php">Gestion des commandes</a>
     <div class="text-center mt-4">
         <a href="../logout.php" class="btn btn-danger">Déconnexion</a>
     </div>
 </div>
 </body>
 </html>
+
+

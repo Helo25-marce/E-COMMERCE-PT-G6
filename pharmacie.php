@@ -1,6 +1,7 @@
 <?php
 // === pharmacie.php ===
-session_start(); require_once 'config.php';
+session_start();
+require_once 'config.php';
 $type='Parapharmacie';
 $stmt = $pdo->prepare("SELECT id, nom, logo FROM boutiques WHERE nom LIKE ?");
 $stmt->execute(["%$type%"]);
@@ -35,6 +36,7 @@ $boutiques = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </nav>
 <div class="container">
   <h2 class="mb-4 text-center">Parapharmacies locales</h2>
+  <a href="categories.php" class="btn-back">Retour aux catégories</a> <!-- Bouton retour -->
   <div class="row g-4">
     <?php if(empty($boutiques)): ?>
       <p>Aucune parapharmacie trouvée.</p>
