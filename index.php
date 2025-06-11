@@ -1,5 +1,6 @@
 <?php
 session_start();
+$loggedIn = isset($_SESSION['utilisateur_id']); // ou $_SESSION['utilisateur'], selon ton login
 require_once 'config.php';
 
 // Langue
