@@ -47,56 +47,128 @@ if (!empty($_SESSION['panier'])) {
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Mon Panier - BHELMAR</title>
-    <link rel="stylesheet" href="StyleB.css">
+  <meta charset="UTF-8">
+  <title>Mon Panier - BHELMAR</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('hero.jpg') center/cover no-repeat;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 0;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      margin-top: 3rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      backdrop-filter: blur(5px);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #f39c12;
+    }
+    table {
+      width: 100%;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    table th, table td {
+      padding: 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .btn-update, .btn-delete {
+      background-color: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+    }
+    .btn-main, .btn-commande {
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .btn-main {
+      background-color: #3498db;
+      color: white;
+    }
+    .btn-commande {
+      background-color: #2ecc71;
+      color: white;
+    }
+    .btn-main:hover { background-color: #2980b9; }
+    .btn-commande:hover { background-color: #27ae60; }
+    .qte-input {
+      width: 60px;
+      text-align: center;
+      border-radius: 4px;
+      border: none;
+      padding: 4px;
+    }
+    img {
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-    <h1>🛒 Votre Panier</h1>
-    <?php if (empty($liste)): ?>
-        <p>Votre panier est vide.</p>
-    <?php else: ?>
-        <table>
-            <thead>
-                <tr>
-                    <th>Produit</th>
-                    <th>Image</th>
-                    <th>Quantité</th>
-                    <th>Prix</th>
-                    <th>Sous-total</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($liste as $id => $p): ?>
-                <tr>
-                    <td><?= htmlspecialchars($p['nom']) ?></td>
-                    <td><img src="images/<?= htmlspecialchars($p['image_url']) ?>" width="65"></td>
-                    <td>
-                        <form method="post">
-                            <input type="hidden" name="id_produit" value="<?= $id ?>">
-                            <input type="number" name="quantite" min="1" value="<?= $p['quantite'] ?>" class="qte-input">
-                            <input type="hidden" name="maj_quantite" value="1">
-                            <button type="submit" class="btn-update">📝</button>
-                        </form>
-                    </td>
-                    <td><?= number_format($p['prix'], 0, ',', ' ') ?> FCFA</td>
-                    <td><?= number_format($p['sous_total'], 0, ',', ' ') ?> FCFA</td>
-                    <td><a href="?action=supprimer&id=<?= $id ?>" class="btn-delete">❌</a></td>
-                </tr>
-            <?php endforeach; ?>
-            <tr class="total-row">
-                <td colspan="4">Total :</td>
-                <td colspan="2" id="total_global"><?= number_format($total, 0, ',', ' ') ?> FCFA</td>
-            </tr>
-            </tbody>
-        </table>
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <a href="indexboutique.php" class="btn-main">🛍️ Continuer les achats</a>
-            <a href="checkoutB.php" class="btn-commande">🧾 Passer à la commande</a>
-        </div>
-    <?php endif; ?>
+  <h1>🛒 Votre Panier</h1>
+  <?php if (empty($liste)): ?>
+    <p class="text-center">Votre panier est vide.</p>
+  <?php else: ?>
+    <table class="table table-bordered table-striped align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Produit</th>
+          <th>Image</th>
+          <th>Quantité</th>
+          <th>Prix</th>
+          <th>Sous-total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($liste as $id => $p): ?>
+        <tr>
+          <td><?= htmlspecialchars($p['nom']) ?></td>
+          <td><img src="images/<?= htmlspecialchars($p['image_url']) ?>" width="65"></td>
+          <td>
+            <form method="post">
+              <input type="hidden" name="id_produit" value="<?= $id ?>">
+              <input type="number" name="quantite" min="1" value="<?= $p['quantite'] ?>" class="qte-input">
+              <input type="hidden" name="maj_quantite" value="1">
+              <button type="submit" class="btn-update">📝</button>
+            </form>
+          </td>
+          <td><?= number_format($p['prix'], 0, ',', ' ') ?> FCFA</td>
+          <td><?= number_format($p['sous_total'], 0, ',', ' ') ?> FCFA</td>
+          <td><a href="?action=supprimer&id=<?= $id ?>" class="btn-delete">❌</a></td>
+        </tr>
+        <?php endforeach; ?>
+        <tr class="table-info">
+          <td colspan="4" class="text-end"><strong>Total :</strong></td>
+          <td colspan="2"><strong><?= number_format($total, 0, ',', ' ') ?> FCFA</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-end gap-3">
+      <a href="indexboutique.php" class="btn-main">🛍️ Continuer les achats</a>
+      <a href="checkoutB.php" class="btn-commande">🧾 Passer à la commande</a>
+    </div>
+  <?php endif; ?>
 </div>
 </body>
 </html>
