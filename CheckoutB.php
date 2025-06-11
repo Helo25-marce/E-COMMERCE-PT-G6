@@ -2,55 +2,89 @@
 session_start();
 require_once 'config.php';
 
-if (!isset($_SESSION['panier']) || empty($_SESSION['panier'])) {
-    header("Location: panierB.php");
+if (empty($_SESSION['panier']) || empty($_SESSION['utilisateur_id'])) {
+    header('Location: panierB.php');
     exit;
 }
 
-$total = 0;
-foreach ($_SESSION['panier'] as $item) {
-    $total += $item['prix'] * $item['quantite'];
-}
+try {
+    $pdo->beginTransaction();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        $pdo->beginTransaction();
+    // Insertion dans la table commandes
+    $id_utilisateur = $_SESSION['utilisateur_id'];
+    $date_commande = date('Y-m-d H:i:s');
+    $total = 0;
 
-        $id_utilisateur = $_SESSION['user_id'] ?? null;
-        if (!$id_utilisateur) {
-            header('Location: inscription.php');
-            exit;
-        }
-
-        $statut = 'En attente';
-        $moyen_paiement = $_POST['moyen_paiement'] ?? 'espèces';
-        $adresse_livraison = $_POST['adresse'] ?? 'Adresse inconnue';
-        $creneau_livraison = $_POST['creneau'] ?? 'Non précisé';
-
-        // Insérer la commande
-        $stmt = $pdo->prepare("INSERT INTO commandes (id_utilisateur, date_commande, total, statut, moyen_paiement, adresse_livraison, creneau_livraison)
-                               VALUES (?, NOW(), ?, ?, ?, ?, ?)");
-        $stmt->execute([$id_utilisateur, $total, $statut, $moyen_paiement, $adresse_livraison, $creneau_livraison]);
-
-        $id_commande = $pdo->lastInsertId();
-
-        // Insertion des produits
-        $stmt2 = $pdo->prepare("INSERT INTO commande_produits (id_commande, id_produit, quantite, prix_unitaire) VALUES (?, ?, ?, ?)");
-        foreach ($_SESSION['panier'] as $item) {
-            $stmt2->execute([$id_commande, $item['id'], $item['quantite'], $item['prix']]);
-        }
-
-        $pdo->commit();
-        header("Location: facture.php?id_commande=$id_commande");
-        exit;
-
-    } catch (PDOException $e) {
-        $pdo->rollBack();
-        echo "Erreur lors de la validation de la commande : " . $e->getMessage();
+    foreach ($_SESSION['panier'] as $item) {
+        $total += $item['prix'] * $item['quantite'];
     }
+
+    $moyen_paiement = 'Espèces'; // Peut être dynamique selon ton formulaire
+    $adresse_livraison = 'Adresse par défaut'; // À adapter selon ton système
+    $creneau_livraison = 'Matin'; // Idem
+
+    $stmt = $pdo->prepare("INSERT INTO commandes (id_utilisateur, date_commande, total, statut, moyen_paiement, adresse_livraison, creneau_livraison) 
+        VALUES (?, ?, ?, 'En attente', ?, ?, ?)");
+    $stmt->execute([$id_utilisateur, $date_commande, $total, $moyen_paiement, $adresse_livraison, $creneau_livraison]);
+
+    $id_commande = $pdo->lastInsertId();
+
+    // Insertion des produits de la commande
+    $stmt_produit = $pdo->prepare("INSERT INTO commande_produits (id_commande, id_produit, quantite, prix_unitaire) VALUES (?, ?, ?, ?)");
+
+    foreach ($_SESSION['panier'] as $item) {
+        $stmt_produit->execute([
+            $id_commande,
+            $item['id'],
+            $item['quantite'],
+            $item['prix']
+        ]);
+    }
+
+    $pdo->commit();
+
+    // Redirection vers facture
+    $_SESSION['last_commande_id'] = $id_commande;
+    unset($_SESSION['panier']);
+    header('Location: facture.php');
+    exit;
+
+} catch (PDOException $e) {
+    $pdo->rollBack();
+    die("Erreur lors de la validation de la commande : " . $e->getMessage());
+}
+// Envoi du mail
+require 'vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$mail = new PHPMailer(true);
+
+try {
+    // Configuration serveur SMTP (exemple Gmail)
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username = 'tonemail@gmail.com';
+    $mail->Password = 'tonMotDePasseApplication';
+    $mail->SMTPSecure = 'tls';
+    $mail->Port = 587;
+
+    // Destinataire
+    $mail->setFrom('tonemail@gmail.com', 'BHELMAR');
+    $mail->addAddress($email_utilisateur); // Récupéré depuis la BDD
+
+    // Contenu du mail
+    $mail->isHTML(true);
+    $mail->Subject = 'Confirmation de votre commande';
+    $mail->Body    = 'Merci pour votre commande ! Vous pouvez consulter votre <a href="http://localhost/E-COMMERCE-PT-G6/facture/facture_' . $commande_id . '.html">facture ici</a>.';
+
+    $mail->send();
+} catch (Exception $e) {
+    echo "Erreur lors de l'envoi du mail : {$mail->ErrorInfo}";
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
