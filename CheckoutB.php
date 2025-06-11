@@ -1,147 +1,105 @@
 <?php
 session_start();
-require_once 'config.php'; // Connexion PDO via $conn
+require_once 'config.php';
 
-if (empty($_SESSION['panier'])) {
-    header('Location: panierB.php');
+if (!isset($_SESSION['panier']) || empty($_SESSION['panier'])) {
+    header("Location: panierB.php");
     exit;
 }
 
-// Calcul du total
 $total = 0;
 foreach ($_SESSION['panier'] as $item) {
     $total += $item['prix'] * $item['quantite'];
 }
 
-// Si l'utilisateur valide la commande
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['valider'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        $conn->beginTransaction();
+        $pdo->beginTransaction();
 
-        // Insertion de la commande
-        $date = date('Y-m-d H:i:s');
-        $stmt = $conn->prepare("INSERT INTO commandes (date_commande, total) VALUES (?, ?)");
-        $stmt->execute([$date, $total]);
-        $id_commande = $conn->lastInsertId();
-
-        // Insertion des produits de la commande
-        $stmtProduit = $conn->prepare("INSERT INTO commande_produits (id_commande, nom_produit, quantite, prix_unitaire) VALUES (?, ?, ?, ?)");
-
-        foreach ($_SESSION['panier'] as $item) {
-            $stmtProduit->execute([
-                $id_commande,
-                $item['nom'],
-                $item['quantite'],
-                $item['prix']
-            ]);
+        $id_utilisateur = $_SESSION['user_id'] ?? null;
+        if (!$id_utilisateur) {
+            header('Location: inscription.php');
+            exit;
         }
 
-        $conn->commit();
-        unset($_SESSION['panier']); // Vider le panier après validation
-        header('Location: facture.php?id_commande=' . $id_commande);
+        $statut = 'En attente';
+        $moyen_paiement = $_POST['moyen_paiement'] ?? 'espèces';
+        $adresse_livraison = $_POST['adresse'] ?? 'Adresse inconnue';
+        $creneau_livraison = $_POST['creneau'] ?? 'Non précisé';
+
+        // Insérer la commande
+        $stmt = $pdo->prepare("INSERT INTO commandes (id_utilisateur, date_commande, total, statut, moyen_paiement, adresse_livraison, creneau_livraison)
+                               VALUES (?, NOW(), ?, ?, ?, ?, ?)");
+        $stmt->execute([$id_utilisateur, $total, $statut, $moyen_paiement, $adresse_livraison, $creneau_livraison]);
+
+        $id_commande = $pdo->lastInsertId();
+
+        // Insertion des produits
+        $stmt2 = $pdo->prepare("INSERT INTO commande_produits (id_commande, id_produit, quantite, prix_unitaire) VALUES (?, ?, ?, ?)");
+        foreach ($_SESSION['panier'] as $item) {
+            $stmt2->execute([$id_commande, $item['id'], $item['quantite'], $item['prix']]);
+        }
+
+        $pdo->commit();
+        header("Location: facture.php?id_commande=$id_commande");
         exit;
 
-    } catch (Exception $e) {
-        $conn->rollBack();
-        die("Erreur lors de la validation de la commande : " . $e->getMessage());
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        echo "Erreur lors de la validation de la commande : " . $e->getMessage();
     }
 }
-
-// Préparation affichage
-$total = number_format($total, 0, ',', ' ');
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Valider ma commande</title>
+    <title>Validation commande</title>
     <link rel="stylesheet" href="Style.css">
-    <style>
-        .checkout-container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 30px;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 6px 24px rgba(44,60,90,0.08);
-            text-align: center;
-        }
-        .checkout-btns {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        .checkout-btns a, .checkout-btns button {
-            padding: 12px 28px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.2s;
-        }
-        .revoir {
-            background: #ffe5d2;
-            color: #b75b00;
-            border: 1px solid #ffb366;
-        }
-        .revoir:hover {
-            background: #ffb366;
-            color: white;
-        }
-        .good {
-            background: linear-gradient(90deg,#44c5c7,#0080ff 80%);
-            color: #fff;
-            box-shadow: 0 2px 8px #44c5c73a;
-        }
-        .good:hover {
-            background: linear-gradient(90deg,#0080ff,#44c5c7 80%);
-        }
-        table {
-            width: 90%;
-            margin: auto;
-            background: #f5f8ff;
-            border-radius: 10px;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px;
-        }
-    </style>
 </head>
 <body>
-<div class="checkout-container">
-    <h2>Récapitulatif de votre commande</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Produit</th>
-            <th>Quantité</th>
-            <th>Sous-total</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($_SESSION['panier'] as $item): ?>
-            <tr>
-                <td><?= htmlspecialchars($item['nom']) ?></td>
-                <td><?= $item['quantite'] ?></td>
-                <td><?= number_format($item['prix'] * $item['quantite'], 0, ',', ' ') ?> FCFA</td>
-            </tr>
-        <?php endforeach; ?>
-        <tr>
-            <td colspan="2"><strong>Total</strong></td>
-            <td><strong><?= $total ?> FCFA</strong></td>
-        </tr>
-        </tbody>
-    </table>
-    <div class="checkout-btns">
-        <a href="panierB.php" class="revoir">Revoir mon panier</a>
-        <form method="post" style="display:inline;">
-            <button type="submit" name="valider" class="good">Valider</button>
+    <div class="checkout-container">
+        <h2>Récapitulatif</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Quantité</th>
+                    <th>Sous-total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($_SESSION['panier'] as $item): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($item['nom']) ?></td>
+                        <td><?= $item['quantite'] ?></td>
+                        <td><?= number_format($item['prix'] * $item['quantite'], 0, ',', ' ') ?> FCFA</td>
+                    </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td><strong><?= number_format($total, 0, ',', ' ') ?> FCFA</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <form method="post" class="mt-4">
+            <label for="adresse">Adresse de livraison :</label>
+            <input type="text" name="adresse" id="adresse" required class="form-control mb-2">
+
+            <label for="creneau">Créneau horaire :</label>
+            <input type="text" name="creneau" id="creneau" class="form-control mb-2">
+
+            <label for="moyen_paiement">Mode de paiement :</label>
+            <select name="moyen_paiement" id="moyen_paiement" class="form-select mb-3" required>
+                <option value="espèces">Espèces</option>
+                <option value="carte">Carte Bancaire</option>
+                <option value="mobile">Mobile Money</option>
+            </select>
+
+            <button type="submit" class="btn btn-success">Valider la commande</button>
         </form>
     </div>
-</div>
 </body>
 </html>
