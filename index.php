@@ -2,124 +2,114 @@
 session_start();
 require_once 'config.php';
 
-// Gestion de la langue
+// Langue
 $lang = $_GET['lang'] ?? ($_SESSION['lang'] ?? 'fr');
 $_SESSION['lang'] = $lang;
 @include_once "lang/{$lang}.php";
 
-// Obtenir l’état de connexion
+// État de connexion
 $loggedIn = isset($_SESSION['utilisateur_id']);
-
-// Catégories disponibles
-$cats = ['boucherie', 'poissonnerie', 'pharmacie', 'restaurant', 'boulangerie'];
 ?>
 <!DOCTYPE html>
 <html lang="<?= $lang ?>">
 <head>
   <meta charset="UTF-8">
-  <title>Bienvenue sur BHELMAR</title>
+  <title>BHELMAR - Tous à domicile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(135deg, #ece9e6, #ffffff);
-      font-family: 'Segoe UI', sans-serif;
+      background: url('hero.jpg') center/cover no-repeat;
+      position: relative;
+      min-height: 100vh;
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
     }
-    .custom-navbar {
-      background-color: #1c1c1e;
-      padding: .75rem 2rem;
-    }
-    .logo-img { height: 40px; }
-    .site-title { font-size: 1.4rem; font-weight: bold; color: #fff; }
-    .subtitle { color: #bbb; font-size: .8rem; margin-left: 5px; }
-    .hero-section { background: url('hero.jpg') center/cover no-repeat; height: 80vh; position: relative; }
-    .hero-overlay {
+    /* voile noir */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
       background: rgba(0,0,0,0.6);
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      color: #fff; text-align: center; padding: 2rem;
+      z-index: 0;
     }
-    .search-transparent input {
-      background: rgba(255,255,255,0.3);
-      border: 1px solid #ccc;
-      color: #333;
+    .navbar, footer, .hero-overlay { position: relative; z-index: 1; }
+    .custom-navbar { background: rgba(0,0,0,0.8) !important; }
+    .logo-img { height: 40px; }
+    .site-title, .subtitle, .nav-link, footer a { color: white !important; }
+    .auth-icons a { color: white; margin: 0 0.5rem; font-size: 1.2rem; }
+    .search-form { max-width: 600px; width: 100%; }
+    .btn-search { background-color: #e74c3c; color: white; border: none; }
+    .btn-search:hover { background-color: #c0392b; }
+    .categories .boutique-btn { margin: 0.5rem; animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: 0.5; } }
+    .btn-access { background-color: #d35400; color: white; border: none; }
+    .btn-access:hover { background-color: #b03a02; }
+    footer {
+      background: rgba(0,0,0,0.8);
+      padding: 1rem;
+      text-align: center;
     }
-    .search-small select, .search-small button {
-      padding: .5rem;
-    }
-    .categories .btn {
-      margin: .3rem;
-      border-radius: 50px;
-    }
-    footer { background: #1c1c1e; color: #ccc; text-align: center; padding: 1rem; font-size: .9rem; }
+    footer p { margin: 0.2rem; }
   </style>
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg custom-navbar">
-  <a class="navbar-brand d-flex align-items-center" href="index.php">
-    <img src="logo.jpg" alt="Logo" class="logo-img">
-    <span class="site-title">BHELMAR</span>
-    <small class="subtitle">Tous à domicile</small>
-  </a>
-  <div class="collapse navbar-collapse justify-content-end">
-    <ul class="navbar-nav align-items-center">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center" href="index.php">
+      <img src="logo.jpg" class="logo-img me-2" alt="Logo">
+      <div>
+        <div class="site-title">BHELMAR</div>
+        <small class="subtitle">Tous à domicile</small>
+      </div>
+    </a>
+    <div class="ms-auto d-flex align-items-center">
       <?php if (!$loggedIn): ?>
-        <li class="nav-item"><a class="nav-link text-white" href="login.php">Connexion</a></li>
-        <li class="nav-item"><a class="nav-link text-white" href="inscription.php">Inscription</a></li>
+        <a href="login.php" class="auth-icons" title="Se connecter"><i class="fas fa-sign-in-alt"></i></a>
+        <a href="inscription.php" class="auth-icons" title="S'inscrire"><i class="fas fa-user-plus"></i></a>
       <?php else: ?>
-        <li class="nav-item"><a class="nav-link text-white" href="welcome.php">Mon compte</a></li>
-        <li class="nav-item"><a class="nav-link text-white" href="logout.php">Déconnexion</a></li>
+        <a href="welcome.php" class="auth-icons" title="Mon profil"><i class="fas fa-user-circle"></i></a>
+        <a href="logout.php" class="auth-icons" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
       <?php endif; ?>
-      <li class="nav-item ms-3">
-        <form method="GET" id="lang-form">
-          <select class="form-select form-select-sm" name="lang" onchange="this.form.submit()">
-            <?php foreach ($langs as $code=>$label): ?>
-              <option value="<?= $code ?>" <?= $lang=== $code?'selected':'' ?>><?= $label ?></option>
-            <?php endforeach; ?>
-          </select>
-        </form>
-      </li>
-    </ul>
+      <form method="GET" class="ms-3">
+        <select name="lang" class="form-select form-select-sm" onchange="this.form.submit()">
+          <?php foreach(['fr'=>'Français','en'=>'English','es'=>'Español','de'=>'Deutsch'] as \$code=>\$lbl): ?>
+            <option value="<?= \$code ?>" <?= \$lang===\$code?'selected':'' ?>><?= \$lbl ?></option>
+          <?php endforeach; ?>
+        </select>
+      </form>
+    </div>
   </div>
 </nav>
 
-<section class="hero-section">
-  <div class="hero-overlay">
-    <h1><?= TXT_WELCOME ?></h1>
-    <p class="mb-4"><?= TXT_SUBTITLE ?></p>
+<section class="hero-overlay d-flex flex-column justify-content-center align-items-center text-center" style="height:80vh;">
+  <h1 class="display-4 mb-3"><?= TXT_WELCOME ?></h1>
+  <p class="lead mb-4"><?= TXT_SUBTITLE ?></p>
 
-    <!-- Barre de recherche transparente -->
-    <form method="GET" action="recherche.php" class="w-75 search-transparent mb-3">
-      <input type="text" name="q" class="form-control" placeholder="<?= TXT_PLACEHOLDER ?>">
-    </form>
-    <!-- Filtre catégories plus petite -->
-    <form method="GET" action="recherche.php" class="d-flex w-50 search-small">
-      <select name="categorie" class="form-select me-2">
-        <option value=""><?= TXT_ALL_CATEGORIES ?></option>
-        <?php foreach($cats as $cat): ?>
-          <option value="<?= $cat ?>"><?= ucfirst($cat) ?></option>
-        <?php endforeach; ?>
-      </select>
-      <button class="btn btn-light"><i class="fas fa-search"></i></button>
-    </form>
+  <!-- Barre de recherche principale transparente -->
+  <form method="GET" action="recherche.php" class="search-form d-flex mb-3">
+    <input type="text" name="q" class="form-control me-2" placeholder="<?= TXT_PLACEHOLDER ?>" style="background: rgba(255,255,255,0.3); border: none;">
+    <button type="submit" class="btn btn-search">Rechercher</button>
+  </form>
 
-    <!-- Boutons catégories dynamiques -->
-    <div class="categories mt-4">
-      <?php foreach($cats as $cat): ?>
-        <a href="indexboutique.php?categorie=<?= $cat ?>" class="btn btn-outline-light text-capitalize"><?= $cat ?></a>
-      <?php endforeach; ?>
-      <a href="indexboutique.php" class="btn btn-outline-info">Accès aux Boutiques</a>
-    </div>
+  <!-- Catégories adaptatives -->
+  <div class="categories text-center">
+    <?php foreach(\$cats as \$cat): ?>
+      <a href="indexboutique.php?categorie=<?= \$cat ?>" class="btn btn-outline-light boutique-btn text-capitalize"><?= \$cat ?></a>
+    <?php endforeach; ?>
   </div>
+
+  <!-- Accès aux boutiques, bouton frappant -->
+  <a href="indexboutique.php" class="btn btn-access mt-4">Accès aux boutiques</a>
 </section>
 
 <footer>
-  <p>Contact: 657558491 | heloisemarcellinepelagiekackka@gmail.com</p>
+  <p>Tel: 657558491 | Email: <a href="mailto:heloisemarcellinepelagiekackka@gmail.com">heloïsemarcellinepelagiekackka@gmail.com</a></p>
   <p>&copy; 2025 BHELMAR</p>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
