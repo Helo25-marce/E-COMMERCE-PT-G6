@@ -21,7 +21,7 @@ $cats = ['boucherie','poissonnerie','pharmacie','restaurant','boulangerie'];
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body{background:url('Images.h/marche.jpg')center/cover no-repeat;position:relative;margin:0;font-family:'Segoe UI',sans-serif;color:#fff;min-height:100vh}
+    body{background:url('images.h/marche.jpg')center/cover no-repeat;position:relative;margin:0;font-family:'Segoe UI',sans-serif;color:#fff;min-height:100vh}
     body::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:0}
     .navbar,.hero-overlay,footer{position:relative;z-index:1}
     .custom-navbar{background:rgba(0,0,0,0.8)!important}
@@ -61,7 +61,7 @@ $cats = ['boucherie','poissonnerie','pharmacie','restaurant','boulangerie'];
         <div class="auth-item"><a href="login.php" class="text-white"><i class="fas fa-sign-in-alt"></i><span>Se connecter</span></a></div>
         <div class="auth-item"><a href="inscription.php" class="text-white"><i class="fas fa-user-plus"></i><span>S'inscrire</span></a></div>
       <?php else: ?>
-        <div class="auth-item"><a href="welcome.php" class="text-white"><i class="fas fa-user-circle"></i><span>Mon compte</span></a></div>
+        <div class="auth-item"><a href="profile.php" class="text-white"><i class="fas fa-user-circle"></i><span>Mon compte</span></a></div>
         <div class="auth-item"><a href="logout.php" class="text-white"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a></div>
         <div class="cart-item"><a href="panierB.php" class="text-white"><i class="fas fa-shopping-cart"></i><span>Panier</span></a></div>
       <?php endif; ?>
