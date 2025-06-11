@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['valider'])) {
         $id_commande = $conn->lastInsertId();
 
         // Insertion des produits de la commande
-        $stmtProduit = $conn->prepare("INSERT INTO commande_produit (id_commande, nom_produit, quantite, prix_unitaire) VALUES (?, ?, ?, ?)");
+        $stmtProduit = $conn->prepare("INSERT INTO commande_produits (id_commande, nom_produit, quantite, prix_unitaire) VALUES (?, ?, ?, ?)");
 
         foreach ($_SESSION['panier'] as $item) {
             $stmtProduit->execute([
