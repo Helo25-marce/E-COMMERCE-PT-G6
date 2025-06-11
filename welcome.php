@@ -4,10 +4,11 @@ if (!isset($_SESSION['utilisateur'])) {
     header("Location: login.php");
     exit();
 }
-$user = $_SESSION['utilisateur'];
 ?>
-
-<h1>Bienvenue <?= htmlspecialchars($user['prenom']) ?> !</h1>
-<p><a href="logout.php">Se déconnecter</a></p>
-<p><a href="panier.php">Voir le panier</a></p>
-<p><a href="profile.php">Mon Profil</a></p>
+<h1>Bienvenue <?= htmlspecialchars($_SESSION['utilisateur']['prenom']) ?> !</h1>
+<ul>
+    <li><a href="indexboutique.php">Voir les boutiques</a></li>
+    <li><a href="profile.php">Mon profil</a></li>
+    <li><a href="panier.php">Voir mon panier</a></li>
+    <li><a href="logout.php">Se déconnecter</a></li>
+</ul>

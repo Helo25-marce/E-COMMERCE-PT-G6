@@ -6,12 +6,10 @@ if (!isset($_SESSION['utilisateur'])) {
 }
 $user = $_SESSION['utilisateur'];
 ?>
-<h2>Profil</h2>
-<ul>
-    <li>Nom : <?= htmlspecialchars($user['nom']) ?></li>
-    <li>Prénom : <?= htmlspecialchars($user['prenom']) ?></li>
-    <li>Email : <?= htmlspecialchars($user['email']) ?></li>
-    <li>Téléphone : <?= htmlspecialchars($user['telephone']) ?></li>
-    <li>Adresse : <?= htmlspecialchars($user['adresse']) ?></li>
-</ul>
-<a href="welcome.php">Retour</a>
+<h2>Mon Profil</h2>
+<p>Nom : <?= $user['nom'] ?></p>
+<p>Prénom : <?= $user['prenom'] ?></p>
+<p>Email : <?= $user['email'] ?></p>
+<p>Téléphone : <?= $user['telephone'] ?></p>
+<p>Adresse : <?= $user['adresse'] ?></p>
+<a href="welcome.php">Retour à l'accueil</a>

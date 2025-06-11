@@ -4,7 +4,7 @@ require_once("config.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
-    $mot_de_passe = $_POST['mot_de_passe'];
+    $password = $_POST['password'];
 
     $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE email = ?");
     $stmt->bind_param("s", $email);
@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $stmt->get_result();
 
     if ($user = $result->fetch_assoc()) {
-        if (password_verify($mot_de_passe, $user['mot_de_passe'])) {
+        if (password_verify($password, $user['mot_de_passe'])) {
             $_SESSION['utilisateur'] = $user;
             header("Location: welcome.php");
             exit();
@@ -20,14 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Mot de passe incorrect.";
         }
     } else {
-        echo "Email non trouvé.";
+        echo "Utilisateur non trouvé.";
     }
 }
 ?>
-
-<!-- HTML login.php -->
-<form method="POST" action="">
+<form method="POST">
     <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="mot_de_passe" placeholder="Mot de passe" required>
-    <button type="submit">Connexion</button>
+    <input type="password" name="password" placeholder="Mot de passe" required>
+    <button type="submit">Se connecter</button>
 </form>
+<a href="register.php">Créer un compte</a>
+
