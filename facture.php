@@ -3,12 +3,12 @@ session_start();
 require_once 'config.php';
 
 // Vérifier la session utilisateur
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['last_commande_id'])) {
+if (!isset($_SESSION['utilisateur_id']) || !isset($_SESSION['last_commande_id'])) {
     die("Accès refusé.");
 }
 
 $commande_id = $_SESSION['last_commande_id'];
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['utilisateur_id'];
 
 // Récupérer les infos de la commande
 $stmt = $pdo->prepare("SELECT * FROM commandes WHERE id_commande = ? AND id_utilisateur = ?");
@@ -38,12 +38,13 @@ ob_start();
     <meta charset="UTF-8">
     <title>Facture - Commande #<?= $commande_id ?></title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { text-align: center; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        h1 { text-align: center; color: #2c3e50; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f5f5f5; }
+        th { background-color: #ecf0f1; }
         .total { text-align: right; font-size: 18px; margin-top: 20px; }
+        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #888; }
     </style>
 </head>
 <body>
@@ -77,6 +78,7 @@ ob_start();
     </table>
 
     <p class="total"><strong>Total: <?= number_format($total, 0, ',', ' ') ?> FCFA</strong></p>
+    <div class="footer">Merci pour votre confiance. BHELMAR - E-commerce collaboratif.</div>
 </body>
 </html>
 <?php

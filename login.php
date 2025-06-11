@@ -46,11 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if ($message): ?>
                     <div class="alert alert-danger"><?= htmlspecialchars($message) ?></div>
                 <?php endif; ?>
-                <form method="post">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Adresse email</label>
-                        <input type="email" name="email" class="form-control" required>
-                    </div>
+                <form method="POST" action="login.php">
+                       <input type="email" name="email" required>
+                         <input type="password" name="mot_de_passe" required>
+                         <button type="submit">Connexion</button>
+                </form>
+
                     <div class="mb-3">
                         <label for="mot_de_passe" class="form-label">Mot de passe</label>
                         <input type="password" name="mot_de_passe" class="form-control" required>
