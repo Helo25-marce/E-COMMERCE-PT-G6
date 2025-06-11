@@ -18,11 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['utilisateur_email'] = $utilisateur['email'];
         $_SESSION['utilisateur_role'] = $utilisateur['role'];
 
-        if ($utilisateur['role'] === 'admin') {
-            header("Location: admin/dashboard.php");
-        } else {
-            header("Location: welcome.php");
-        }
+        // Redirection vers index.php pour tous les rôles
+        header("Location: index.php");
         exit;
     } else {
         $message = "Email ou mot de passe incorrect.";
@@ -37,23 +34,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(120deg, #2980b9, #6dd5fa);
+            background: linear-gradient(120deg, #3498db, #8e44ad);
             font-family: 'Segoe UI', sans-serif;
         }
         .card {
             margin-top: 100px;
             border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
         }
         .btn-primary {
-            background-color: #3498db;
+            background-color: #8e44ad;
             border: none;
         }
         .btn-primary:hover {
-            background-color: #2980b9;
+            background-color: #732d91;
         }
         .form-control:focus {
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.8);
+            box-shadow: 0 0 5px rgba(142, 68, 173, 0.7);
         }
     </style>
 </head>
