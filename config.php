@@ -1,20 +1,13 @@
 <?php
 $host = 'localhost';
-$db = 'gestion_bhelmar';
+$dbname = 'gestion_bhelmar'; // Remplace par le nom exact de ta base
 $user = 'root';
-$pass = ''; // ou 'ton_mot_de_passe'
-$charset = 'utf8mb4';
-
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // important pour afficher les erreurs
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
+$pass = ''; // Mot de passe vide par défaut sous XAMPP
 
 try {
-    $conn = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    die('Erreur de connexion à la base de données : ' . $e->getMessage());
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Erreur de connexion : " . $e->getMessage());
 }
 ?>
