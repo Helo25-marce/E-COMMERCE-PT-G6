@@ -7,7 +7,7 @@ $lang = $_GET['lang'] ?? ($_SESSION['lang'] ?? 'fr');
 $_SESSION['lang'] = $lang;
 @include_once "lang/{$lang}.php";
 
-// Connexion
+// État de connexion
 $loggedIn = isset($_SESSION['utilisateur_id']);
 ?>
 <!DOCTYPE html>
@@ -22,8 +22,9 @@ $loggedIn = isset($_SESSION['utilisateur_id']);
       background: url('hero.jpg') center/cover no-repeat;
       position: relative;
       min-height: 100vh;
-      margin:0;
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
+      color: #fff;
     }
     /* voile noir */
     body::before {
@@ -34,19 +35,23 @@ $loggedIn = isset($_SESSION['utilisateur_id']);
       z-index: 0;
     }
     .navbar, footer, .hero-overlay { position: relative; z-index: 1; }
-    .custom-navbar { background: rgba(0,0,0,0.7) !important; }
-    .logo-img { height:40px; }
-    .site-title, .subtitle { color: white; }
-    .search-form { max-width: 600px; margin: auto; }
-    .btn-search { background-color: #27ae60; color: white; }
-    .btn-search:hover { background-color: #219150; }
-    .categories a.boutique-btn {
-      animation: blink 1s infinite;
-      margin-top:1rem;
-    }
+    .custom-navbar { background: rgba(0,0,0,0.8) !important; }
+    .logo-img { height: 40px; }
+    .site-title, .subtitle, .nav-link, footer a { color: white !important; }
+    .auth-icons a { color: white; margin: 0 0.5rem; font-size: 1.2rem; }
+    .search-form { max-width: 600px; width: 100%; }
+    .btn-search { background-color: #e67e22; color: white; }
+    .btn-search:hover { background-color: #cf711f; }
+    .categories .boutique-btn { margin: 0.5rem; animation: blink 1s infinite; }
     @keyframes blink { 50% { opacity: 0.5; } }
-    footer { background: rgba(0,0,0,0.7); color: #ccc; padding:1rem; }
-    .auth-icons a { color:white; margin-left:1rem; font-size:1.2rem; }
+    .btn-access { background-color: #d35400; color: white; border: none; }
+    .btn-access:hover { background-color: #b03a02; }
+    footer {
+      background: rgba(0,0,0,0.8);
+      padding: 1rem;
+      text-align: center;
+    }
+    footer p { margin: 0.2rem; }
   </style>
 </head>
 <body>
@@ -64,11 +69,12 @@ $loggedIn = isset($_SESSION['utilisateur_id']);
         <a href="login.php" class="auth-icons"><i class="fas fa-sign-in-alt"></i></a>
         <a href="inscription.php" class="auth-icons"><i class="fas fa-user-plus"></i></a>
       <?php else: ?>
+        <a href="welcome.php" class="auth-icons"><i class="fas fa-user-circle"></i></a>
         <a href="logout.php" class="auth-icons"><i class="fas fa-sign-out-alt"></i></a>
       <?php endif; ?>
       <form method="GET" class="ms-3">
         <select name="lang" class="form-select form-select-sm" onchange="this.form.submit()">
-          <?php foreach([ 'fr'=>'Français','en'=>'English','es'=>'Español'] as $code=>$lbl): ?>
+          <?php foreach([ 'fr'=>'Français','en'=>'English','es'=>'Español','de'=>'Deutsch'] as $code=>$lbl): ?>
             <option value="<?= $code ?>" <?= $lang===$code?'selected':'' ?>><?= $lbl ?></option>
           <?php endforeach; ?>
         </select>
@@ -77,23 +83,29 @@ $loggedIn = isset($_SESSION['utilisateur_id']);
   </div>
 </nav>
 
-<section class="hero-overlay d-flex flex-column justify-content-center align-items-center text-white text-center" style="height:80vh;">
+<section class="hero-overlay d-flex flex-column justify-content-center align-items-center text-center" style="height:80vh;">
   <h1 class="display-4 mb-3"><?= TXT_WELCOME ?></h1>
   <p class="lead mb-4"><?= TXT_SUBTITLE ?></p>
-  <form method="GET" action="recherche.php" class="search-form d-flex">
-    <input type="text" name="q" class="form-control me-2" style="background:rgba(255,255,255,0.3); border:none;" placeholder="<?= TXT_PLACEHOLDER ?>">
+
+  <!-- Barre de recherche principale transparente -->
+  <form method="GET" action="recherche.php" class="search-form d-flex mb-3">
+    <input type="text" name="q" class="form-control me-2" placeholder="<?= TXT_PLACEHOLDER ?>" style="background: rgba(255,255,255,0.3); border: none;">
     <button type="submit" class="btn btn-search">Rechercher</button>
   </form>
-  <div class="categories d-flex flex-wrap justify-content-center mt-4">
+
+  <!-- Catégories adaptatives -->
+  <div class="categories text-center">
     <?php foreach($cats as $cat): ?>
-      <a href="indexboutique.php?categorie=<?= $cat ?>" class="btn btn-outline-light me-2 boutique-btn text-capitalize"><?= $cat ?></a>
+      <a href="indexboutique.php?categorie=<?= $cat ?>" class="btn btn-outline-light boutique-btn text-capitalize"><?= $cat ?></a>
     <?php endforeach; ?>
-    <a href="indexboutique.php" class="btn btn-info mt-2 boutique-btn">Accès aux boutiques</a>
   </div>
+
+  <!-- Accès aux boutiques, bouton frappant -->
+  <a href="indexboutique.php" class="btn btn-access mt-4">Accès aux boutiques</a>
 </section>
 
-<footer class="text-center">
-  <p>Tel: 657558491 | Email: <a href="mailto:heloisemarcellinepelagiekackka@gmail.com" class="text-white">heloïsemarcellinepelagiekackka@gmail.com</a></p>
+<footer>
+  <p>Tel: 657558491 | Email: <a href="mailto:heloisemarcellinepelagiekackka@gmail.com">heloïsemarcellinepelagiekackka@gmail.com</a></p>
   <p>&copy; 2025 BHELMAR</p>
 </footer>
 
