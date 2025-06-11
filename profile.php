@@ -1,22 +1,17 @@
 <?php
 session_start();
 if (!isset($_SESSION['utilisateur'])) {
-    header('Location: login.php');
-    exit;
+    header("Location: login.php");
+    exit();
 }
-
 $user = $_SESSION['utilisateur'];
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Profil</title>
-    <link rel="stylesheet" href="inscription.css">
-</head>
-<body>
-    <div class="form-container">
-        <h2>Bienvenue, <?= htmlspecialchars($user['nom']) ?> (<?= $user['role'] ?>)</h2>
-        <p><a href="logout.php">Déconnexion</a></p>
-    </div>
-</body>
-</html>
+<h2>Profil</h2>
+<ul>
+    <li>Nom : <?= htmlspecialchars($user['nom']) ?></li>
+    <li>Prénom : <?= htmlspecialchars($user['prenom']) ?></li>
+    <li>Email : <?= htmlspecialchars($user['email']) ?></li>
+    <li>Téléphone : <?= htmlspecialchars($user['telephone']) ?></li>
+    <li>Adresse : <?= htmlspecialchars($user['adresse']) ?></li>
+</ul>
+<a href="welcome.php">Retour</a>
