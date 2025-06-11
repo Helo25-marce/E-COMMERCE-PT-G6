@@ -31,7 +31,7 @@ $cats = ['boucherie', 'poissonnerie', 'pharmacie', 'restaurant', 'boulangerie'];
   <!-- NAVIGATION -->
   <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
     <a class="navbar-brand d-flex align-items-center" href="index.php">
-      <img src="logo.jpg" alt="Logo T~D" class="logo-img me-2">
+      <img src="Images.h/logobon.jpg" alt="Logo T~D" class="logo-img me-2">
       <span class="site-title">T~D <small class="subtitle">Tous à domicile</small></span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
