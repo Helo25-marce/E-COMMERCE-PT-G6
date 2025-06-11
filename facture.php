@@ -10,6 +10,11 @@ if (!isset($_SESSION['utilisateur_id']) || !isset($_SESSION['last_commande_id'])
 $commande_id = $_SESSION['last_commande_id'];
 $user_id = $_SESSION['utilisateur_id'];
 
+// Vérifier la connexion à la base
+if (!isset($pdo)) {
+    die("Erreur de connexion à la base de données.");
+}
+
 // Récupérer les infos de la commande
 $stmt = $pdo->prepare("SELECT * FROM commandes WHERE id_commande = ? AND id_utilisateur = ?");
 $stmt->execute([$commande_id, $user_id]);
