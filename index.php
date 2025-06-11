@@ -57,49 +57,32 @@ $cats = ['boucherie','poissonnerie','pharmacie','restaurant','boulangerie'];
       <div><div class="site-title">BHELMAR</div><small class="subtitle">Tous à domicile</small></div>
     </a>
     <div class="ms-auto d-flex align-items-center">
-      <?php foreach([['icon'=>'fas fa-sign-in-alt','text'=>'Se connecter','url'=>'login.php'],['icon'=>'fas fa-user-plus','text'=>'S\'inscrire','url'=>'inscription.php']] as $item): ?>
-        <?php if(!$loggedIn): ?>
-          <div class="auth-item"><a href="<?= $item['url'] ?>" class="text-white"><i class="<?= $item['icon'] ?>"></i><span><?= $item['text'] ?></span></a></div>
-        <?php endif; ?>
-      <?php endforeach; ?>
-      <?php if($loggedIn): ?>
-        <div class="auth-item"><a href="profile.php" class="text-white"><i class="fas fa-user-circle"></i><span>Mon compte</span></a></div>
-        <div class="auth-item"><a href="panierB.php" class="text-white"><i class="fas fa-shopping-cart"></i><span>Panier</span></a></div>
-        <div class="auth-item"><a href="logout.php" class="text-white"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a></div>
-      <?php endif; ?>
-      <form method="GET" class="ms-3"><select name="lang" class="form-select form-select-sm" onchange="this.form.submit()">
-        <?php foreach(['fr'=>'Français','en'=>'English','es'=>'Español','de'=>'Deutsch','ar'=>'العربية','zh'=>'中文'] as $code=>$lbl): ?>
-          <option value="<?= \$code ?>" <?= \$lang===\$code?'selected':'' ?>><?= \$lbl ?></option>
-        <?php endforeach; ?>
-      </select></form>
-    </div>
+      <?php if (!\$loggedIn): ?>
+        <div class="auth-item"><a href="login.php" class="text-white"><i class="fas fa-sign-in-alt"></i><span>Se connecter</span></a></div>
         <div class="auth-item"><a href="inscription.php" class="text-white"><i class="fas fa-user-plus"></i><span>S'inscrire</span></a></div>
       <?php else: ?>
         <div class="auth-item"><a href="profile.php" class="text-white"><i class="fas fa-user-circle"></i><span>Mon compte</span></a></div>
-        <div class="auth-item"><a href="logout.php" class="text-white"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a></div>
         <div class="cart-item"><a href="panierB.php" class="text-white"><i class="fas fa-shopping-cart"></i><span>Panier</span></a></div>
+        <div class="auth-item"><a href="logout.php" class="text-white"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a></div>
       <?php endif; ?>
-      <form method="GET" class="ms-3"><select name="lang" class="form-select form-select-sm" onchange="this.form.submit()">
-        <?php foreach(['fr'=>'Français','en'=>'English','es'=>'Español','de'=>'Deutsch','ar'=>'العربية','zh'=>'中文'] as $code=>$lbl): ?>
-          <option value="<?= $code ?>" <?= $lang===$code?'selected':'' ?>><?= $lbl ?></option>
-        <?php endforeach; ?>
-      </select></form>
+      <form method="GET" class="ms-3">
+        <select name="lang" class="form-select form-select-sm" onchange="this.form.submit()">
+          <?php foreach (['fr'=>'Français','en'=>'English','es'=>'Español','de'=>'Deutsch','ar'=>'العربية','zh'=>'中文'] as \$code=>\$lbl): ?>
+            <option value="<?= \$code ?>" <?= \$lang===\$code?'selected':'' ?>><?= \$lbl ?></option>
+          <?php endforeach; ?>
+        </select>
+      </form>
     </div>
   </div>
 </nav>
+
 <section class="hero-overlay d-flex flex-column justify-content-center align-items-center text-center" style="height:80vh;">
-  <h1 class="display-4 mb-3"><?= TXT_WELCOME ?></h1><p class="lead mb-4"><?= TXT_SUBTITLE ?></p>
+  <h1 class="display-4 mb-3"><?= TXT_WELCOME ?></h1>
+  <p class="lead mb-4"><?= TXT_SUBTITLE ?></p>
   <form method="GET" action="recherche.php" class="search-form d-flex mb-3 mx-auto">
     <input type="text" name="q" class="form-control me-2" placeholder="<?= TXT_PLACEHOLDER ?>" style="background:rgba(255,255,255,0.3);border:none;">
     <button type="submit" class="btn btn-search">Rechercher</button>
   </form>
-  <div class="categories text-center">
-    <?php foreach($cats as $cat): ?>
-      <a href="indexboutique.php?categorie=<?= $cat ?>" class="boutique-btn btn-<?= $cat ?> text-capitalize"><?= ucfirst($cat) ?></a>
-    <?php endforeach; ?>
-  </div>
-  <a href="indexboutique.php" class="btn btn-access mt-4">Accès aux boutiques</a>
-</section>
 <footer>
   <p>Tel: 657558491 | Email: <a href="mailto:heloisemarcellinepelagiekackka@gmail.com">heloïsemarcellinepelagiekackka@gmail.com</a></p>
   <p>&copy; 2025 BHELMAR</p>
