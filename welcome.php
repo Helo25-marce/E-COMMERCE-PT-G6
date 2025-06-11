@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 if (!isset($_SESSION['utilisateur_id'])) {
     header('Location: login.php');
     exit;
@@ -12,46 +11,30 @@ if (!isset($_SESSION['utilisateur_id'])) {
     <meta charset="UTF-8">
     <title>Bienvenue</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #74ebd5, #9face6);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', sans-serif;
-        }
-        .welcome-box {
-            background-color: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
-        }
-        .welcome-box h1 {
-            font-size: 2em;
-            color: #2c3e50;
-        }
-        .welcome-box p {
-            margin: 10px 0;
-            font-size: 1.1em;
-        }
-        .welcome-box .btn {
-            margin: 10px 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="Wel.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <div class="welcome-box">
-        <h1>Bienvenue <?= htmlspecialchars($_SESSION['utilisateur_nom']) ?> !</h1>
-        <p><strong>Rôle :</strong> <?= htmlspecialchars($_SESSION['utilisateur_role']) ?></p>
-        <p><strong>Email :</strong> <?= htmlspecialchars($_SESSION['utilisateur_email']) ?></p>
-        <div class="mt-4">
-            <a href="index.php" class="btn btn-success">Aller à l'accueil</a>
-            <a href="logout.php" class="btn btn-danger">Déconnexion</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="index.php">
+                <i class="fas fa-home me-2"></i>BHELMAR
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="navbar-text text-white me-3">
+                    Connecté en tant que <?= htmlspecialchars($_SESSION['utilisateur_nom']) ?>
+                </span>
+                <a href="logout.php" class="btn btn-outline-light">Déconnexion</a>
+            </div>
         </div>
+    </nav>
+    <div class="container mt-5 text-center welcome-box">
+        <h1 class="mb-3">Bienvenue <?= htmlspecialchars($_SESSION['utilisateur_nom']) ?> !</h1>
+        <p class="lead">Votre rôle : <?= htmlspecialchars($_SESSION['utilisateur_role']) ?></p>
+        <p>Email : <?= htmlspecialchars($_SESSION['utilisateur_email']) ?></p>
+        <a href="index.php" class="btn btn-accent mt-3">
+            <i class="fas fa-store me-1"></i>Retour à l'accueil
+        </a>
     </div>
 </body>
 </html>
