@@ -51,8 +51,16 @@ if (!$boutique) {
     <h2><?= htmlspecialchars($boutique['nom']) ?></h2>
     <img src="images/<?= htmlspecialchars($boutique['logo']) ?>" alt="<?= htmlspecialchars($boutique['nom']) ?>" class="product-img">
     <p><?= nl2br(htmlspecialchars($boutique['description'])) ?></p>
+    
+    <!-- Formulaire d'ajout au panier -->
+    <form action="panierB.php" method="post" class="mt-4">
+      <input type="hidden" name="id_boutique" value="<?= $boutique['id'] ?>">
+      <label for="quantite">Quantité :</label>
+      <input type="number" id="quantite" name="quantite" value="1" min="1" class="form-control mb-2" style="max-width:100px; margin:auto;">
+      <button type="submit" class="btn btn-success btn-sm">Ajouter au panier</button>
+    </form>
+
     <a href="indexboutique.php" class="btn-back">Retour aux boucheries</a>
   </div>
-
 </body>
 </html>

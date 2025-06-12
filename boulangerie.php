@@ -1,43 +1,58 @@
 <?php
 // === boulangerie.php ===
-session_start(); require_once 'config.php';
-$type = 'Boulangerie';
-$loggedIn = isset($_SESSION['utilisateur']);
+session_start();
+require_once 'config.php';
 
+$type = 'Boulangerie';
 $stmt = $pdo->prepare("SELECT id, nom, logo FROM boutiques WHERE nom LIKE ?");
-$stmt->execute(["%{$type}%"]);
+$stmt->execute(["%$type%"]);
 $boutiques = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"><title>Boulangeries - BHELMAR</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Boulangeries - BHELMAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body{background:#f5f5f5;font-family:'Segoe UI',sans-serif;margin:0;padding:0}
-    .navbar{background:#d35400}
-    .navbar-brand, .nav-link{color:#fff!important}
-    .container{padding:2rem}
-    .card{border:none;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);margin-bottom:1.5rem}
-    .card-title{color:#f39c12}
-    .btn-detail{background:#f39c12;color:#fff;border:none}
+    body { background: #fff; font-family: 'Segoe UI', sans-serif; }
+    .navbar { background: #c0392b; }
+    .navbar-brand { color: #fff !important; }
+    .container { padding: 2rem; }
+    .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; transition: transform .2s; }
+    .card:hover { transform: translateY(-5px); }
+    .card-img-top { height: 200px; object-fit: cover; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+    .card-title { color: #c0392b; font-weight: bold; }
+    .btn-back { display: inline-block; margin-bottom: 1rem; color: #c0392b; text-decoration: none; font-weight: bold; }
+    .btn-detail { background: #c0392b; color: #fff; border: none; padding: .5rem 1rem; border-radius: 8px; }
+    .btn-detail:hover { background: #96281b; }
   </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg"><div class="container-fluid"><a class="navbar-brand" href="categories.php">Catégories</a></div></nav>
+<nav class="navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="categories.php">← Catégories</a>
+  </div>
+</nav>
 <div class="container">
   <h2 class="mb-4 text-center">Boulangeries locales</h2>
-  <div class="row">
-    <?php if(empty($boutiques)): ?>
+  <a href="categories.php" class="btn-back">Retour aux catégories</a>
+  <div class="row g-4">
+    <?php if (empty($boutiques)): ?>
       <p>Aucune boulangerie trouvée.</p>
-    <?php endif; foreach($boutiques as $b): ?>
+    <?php endif; foreach ($boutiques as $b): ?>
       <div class="col-md-4">
         <div class="card">
-          <img src="images/<?=htmlspecialchars($b['logo'])?>" class="card-img-top" alt="">
+          <img src="images/<?= htmlspecialchars($b['logo']) ?>" class="card-img-top" alt="">
           <div class="card-body text-center">
-            <h5 class="card-title"><?=htmlspecialchars($b['nom'])?></h5>
-            <a href="detailB.php?id=<?=$b['id']?>" class="btn btn-detail">Voir détails</a>
+            <h5 class="card-title"><?= htmlspecialchars($b['nom']) ?></h5>
+            <a href="detailB.php?id=<?= $b['id'] ?>" class="btn-detail">Voir détails</a> <!-- Redirection vers la page de détail -->
+            <!-- Ajout au panier -->
+            <form action="panierB.php" method="post" class="mt-2">
+              <input type="hidden" name="id_boutique" value="<?= $b['id'] ?>">
+              <button type="submit" class="btn btn-success btn-sm">Ajouter au panier</button>
+            </form>
           </div>
         </div>
       </div>

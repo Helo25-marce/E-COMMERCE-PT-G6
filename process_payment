@@ -1,0 +1,13 @@
+<?php
+// Traitement du paiement (process_payment.php)
+if (isset($_POST['address'])) {
+    $address = $_POST['address'];
+
+    // Traiter la commande, stocker dans la base de données ou procéder au paiement (logique de paiement ici)
+
+    // Afficher la confirmation de la commande
+    echo "<h1>Thank you for your order!</h1>";
+    echo "<p>Your order will be shipped to: $address</p>";
+    echo "<p>We are processing your payment.</p>";
+}
+?>
