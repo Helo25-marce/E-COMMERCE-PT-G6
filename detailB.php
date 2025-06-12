@@ -1,66 +1,92 @@
 <?php
-require_once 'config.php';
 session_start();
+require_once 'config.php';
 
-// Vérifier si l'utilisateur est connecté
+// Vérifier que l'utilisateur est connecté
 if (!isset($_SESSION['utilisateur_id'])) {
-    header('Location: login.php');
-    exit;
+    $_SESSION['utilisateur_id'] = 0; // ou une valeur par défaut
 }
+
 
 // Vérifier que l'ID est fourni
 if (!isset($_GET['id'])) {
     die("Aucun produit sélectionné.");
 }
-$id = (int)$_GET['id'];
 
-// Récupérer les détails de la boutique à partir de l'ID
-$stmt = $pdo->prepare("SELECT * FROM boutiques WHERE id = ?");
+$id = (int) $_GET['id'];
+
+// Récupérer les détails du produit
+$stmt = $pdo->prepare("SELECT * FROM produits WHERE id_produit = ?");
 $stmt->execute([$id]);
-$boutique = $stmt->fetch(PDO::FETCH_ASSOC);
+$produit = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$boutique) {
-    die("Boutique introuvable.");
+if (!$produit) {
+    die("Produit introuvable.");
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Détail Boucherie - BHELMAR</title>
+  <title>Détail du produit</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { background: #fff; font-family: 'Segoe UI', sans-serif; }
-    .navbar { background: #c0392b; }
-    .navbar-brand { color: #fff !important; }
-    .content { max-width: 800px; margin: 4rem auto; background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); }
-    .product-img { width: 100%; max-width: 400px; border-radius: 10px; margin-bottom: 1.5rem; }
-    .btn-back { display: inline-block; margin-top: 2rem; background: #e74c3c; color: #fff; padding: .6rem 1.2rem; border-radius: 8px; text-decoration: none; }
-    .btn-back:hover { background: #c0392b; }
+    body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+    .container { max-width: 800px; margin-top: 50px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    h2 { color: #2c3e50; }
+    .btn-ajouter { background-color: #28a745; color: white; font-weight: bold; }
+    .btn-ajouter:hover { background-color: #218838; }
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="index.php">← Accueil</a>
+
+<div class="container">
+  <h2 class="mb-4"><?= htmlspecialchars($produit['nom']) ?></h2>
+  <p><strong>Prix :</strong> <?= number_format($produit['prix'], 0) ?> FCFA</p>
+  <p><strong>Description :</strong> <?= htmlspecialchars($produit['description']) ?></p>
+
+  <form id="ajoutPanierForm">
+    <input type="hidden" name="produit_id" value="<?= $produit['id_produit'] ?>">
+    <input type="hidden" name="produit_nom" value="<?= $produit['nom'] ?>">
+    <input type="hidden" name="produit_prix" value="<?= $produit['prix'] ?>">
+
+    <div class="mb-3">
+      <label for="quantite" class="form-label">Quantité</label>
+      <input type="number" class="form-control" name="quantite" id="quantite" value="1" min="1" required>
     </div>
-  </nav>
 
-  <div class="content text-center">
-    <h2><?= htmlspecialchars($boutique['nom']) ?></h2>
-    <img src="images/<?= htmlspecialchars($boutique['logo']) ?>" alt="<?= htmlspecialchars($boutique['nom']) ?>" class="product-img">
-    <p><?= nl2br(htmlspecialchars($boutique['description'])) ?></p>
-    
-    <!-- Formulaire d'ajout au panier -->
-    <form action="panierB.php" method="post" class="mt-4">
-      <input type="hidden" name="id_boutique" value="<?= $boutique['id'] ?>">
-      <label for="quantite">Quantité :</label>
-      <input type="number" id="quantite" name="quantite" value="1" min="1" class="form-control mb-2" style="max-width:100px; margin:auto;">
-      <button type="submit" class="btn btn-success btn-sm">Ajouter au panier</button>
-    </form>
+    <button type="submit" class="btn btn-ajouter w-100">🛒 Ajouter au panier</button>
+  </form>
 
-    <a href="indexboutique.php" class="btn-back">Retour aux boucheries</a>
-  </div>
+  <div id="panier-message" class="text-success mt-3 fw-bold" style="display:none;"></div>
+  <a href="panierB.php" class="btn btn-outline-primary mt-3 w-100">🧾 Voir mon panier</a>
+</div>
+
+<!-- Script AJAX -->
+<script>
+  document.getElementById('ajoutPanierForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const message = document.getElementById('panier-message');
+    const data = new FormData(form);
+
+    fetch('ajout_panier.php', {
+      method: 'POST',
+      body: data
+    })
+    .then(res => res.text())
+    .then(result => {
+      message.innerHTML = '✅ Produit ajouté au panier !';
+      message.style.display = 'block';
+    })
+    .catch(() => {
+      message.innerHTML = '❌ Une erreur est survenue.';
+      message.style.display = 'block';
+    });
+  });
+</script>
+
 </body>
 </html>

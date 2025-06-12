@@ -1,150 +1,175 @@
 <?php
-session_start();
 require_once 'config.php';
+session_start();
 
-// Langue
-$lang = $_GET['lang'] ?? ($_SESSION['lang'] ?? 'fr');
-$_SESSION['lang'] = $lang;
-@include_once "lang/{$lang}.php";
-
-// Simuler un panier d'achat
-$cart = [
-    ['name' => 'Item 1', 'price' => 20, 'quantity' => 1],
-    ['name' => 'Item 2', 'price' => 30, 'quantity' => 1],
-    ['name' => 'Item 3', 'price' => 50, 'quantity' => 1],
-];
-
-// Calcul du total du panier
-$total = 0;
-foreach ($cart as $item) {
-    $total += $item['price'] * $item['quantity'];
-}
+$stmt = $pdo->prepare("SELECT * FROM produits WHERE id_categorie = ?");
+$stmt->execute([1]); // Boulangerie
+$produits = $stmt->fetchAll();
 ?>
-
 <!DOCTYPE html>
-<html lang="<?= $lang ?>">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Shopping Cart</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BHELMAR - Boulangerie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
+      background: #fffaf0;
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f6f9;
-      color: #333;
     }
-    .container {
-      max-width: 1200px;
-      margin: 30px auto;
+    .navbar {
+      background: #d35400;
+      padding: 15px 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    .cart-header {
-      text-align: center;
-      margin-bottom: 20px;
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      font-size: 22px;
     }
-    .cart-items {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    .navbar-brand img {
+      height: 40px;
+      margin-right: 10px;
     }
-    .cart-items table {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-    .cart-items table th, .cart-items table td {
-      text-align: left;
-      padding: 10px;
-    }
-    .cart-items table th {
-      background-color: #f1f1f1;
-    }
-    .btn-custom {
-      background-color: #4CAF50;
+    .btn-catalogue, .btn-panier {
       color: #fff;
+      background: #2d3436;
       border: none;
-      padding: 10px 20px;
+      padding: 6px 15px;
       border-radius: 5px;
-      font-size: 16px;
+      text-decoration: none;
+      margin-left: 10px;
+    }
+    .btn-catalogue:hover, .btn-panier:hover {
+      background: #636e72;
+    }
+    .btn-retour {
+      margin-top: 30px;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #d35400;
+      color: white;
+      border-radius: 5px;
       text-decoration: none;
     }
+    .btn-retour:hover {
+      background-color: #b84300;
+    }
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .card:hover {
+      transform: scale(1.03);
+    }
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+    .btn-custom {
+      background-color: #e67e22;
+      color: white;
+      font-weight: 600;
+    }
     .btn-custom:hover {
-      background-color: #45a049;
+      background-color: #cf711f;
     }
-    .total {
+    .badge-promo {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #f1c40f;
+      color: black;
+      padding: 5px 10px;
+      border-radius: 8px;
       font-weight: bold;
-      font-size: 18px;
-      margin-top: 20px;
-    }
-    footer {
-      background: #333;
-      color: #fff;
-      text-align: center;
-      padding: 20px 0;
+      font-size: 13px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="cart-header">
-      <h1>My Shopping Cart</h1>
-    </div>
 
-    <div class="cart-items">
-      <form method="POST" action="CheckoutB.php">
-        <table>
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($cart as $index => $item): ?>
-              <tr>
-                <td><?= htmlspecialchars($item['name']) ?></td>
-                <td>$<?= number_format($item['price'], 2) ?></td>
-                <td>
-                  <input type="number" name="cart[<?= $index ?>][quantity]" value="<?= $item['quantity'] ?>" min="1">
-                </td>
-                <td>
-                  <button class="btn btn-danger btn-sm" name="remove_item" value="<?= $index ?>">Remove</button>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
+<nav class="navbar">
+  <a class="navbar-brand" href="#">
+    <img src="images.h/logobon.jpg" alt="Logo BHELMAR">
+    BHELMAR - Tous à domicile
+  </a>
+  <a href="categories.php" class="btn-catalogue">&larr; Catalogue</a>
+  <a href="panierB.php" class="btn-panier">🛒 Mon panier</a>
+</nav>
 
-        <div class="total">
-          <p>Total: $<?= number_format($total, 2) ?></p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Produits de la Boulangerie</h2>
+  <div class="row" id="liste-produits">
+    <?php if (!empty($produits)): ?>
+      <?php foreach ($produits as $produit): ?>
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <?php if ($produit['est_promo'] == 1): ?>
+              <div class="badge-promo">Promo</div>
+            <?php endif; ?>
+            <img src="<?= htmlspecialchars($produit['image_url']) ?>" class="card-img-top" alt="<?= htmlspecialchars($produit['nom']) ?>">
+            <div class="card-body">
+              <h5 class="card-title"><?= htmlspecialchars($produit['nom']) ?></h5>
+              <p class="card-text"><?= htmlspecialchars($produit['description']) ?></p>
+              <p><strong><?= number_format($produit['prix'], 0) ?> FCFA</strong> / <?= $produit['unite'] ?></p>
+              <div class="d-flex justify-content-between">
+                <a href="detailB.php?id=<?= $produit['id_produit'] ?>" class="btn btn-outline-secondary btn-sm">Voir détail</a>
+                <button class="btn btn-custom btn-sm ajouter-panier" 
+                        data-id="<?= $produit['id_produit'] ?>"
+                        data-nom="<?= htmlspecialchars($produit['nom']) ?>"
+                        data-prix="<?= $produit['prix'] ?>">
+                        Ajouter au panier
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <!-- Passer les données du panier -->
-        <?php foreach ($cart as $index => $item): ?>
-          <input type="hidden" name="cart[<?= $index ?>][name]" value="<?= htmlspecialchars($item['name']) ?>">
-          <input type="hidden" name="cart[<?= $index ?>][price]" value="<?= $item['price'] ?>">
-        <?php endforeach; ?>
-
-        <div class="actions text-center">
-          <button class="btn-custom" type="button" onclick="goBack()">⬅ Go Back</button>
-          <button class="btn-custom" type="submit" name="checkout" value="true">✅ Checkout</button>
-        </div>
-      </form>
-    </div>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <div class="col-12 text-center">
+        <p class="text-danger">Aucun produit disponible actuellement dans cette section.</p>
+      </div>
+    <?php endif; ?>
   </div>
+  <div class="text-center">
+    <a href="categories.php" class="btn-retour">← Retour aux catégories</a>
+  </div>
+</div>
 
-  <footer>
-    <p>&copy; 2025 BHELMAR - All Rights Reserved</p>
-  </footer>
+<script>
+  document.querySelectorAll('.ajouter-panier').forEach(button => {
+    button.addEventListener('click', () => {
+      const id = button.dataset.id;
+      const nom = button.dataset.nom;
+      const prix = button.dataset.prix;
 
-  <script>
-    function goBack() {
-      window.history.back();
-    }
-  </script>
+      const formData = new FormData();
+      formData.append('produit_id', id);
+      formData.append('produit_nom', nom);
+      formData.append('produit_prix', prix);
+      formData.append('quantite', 1);
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      fetch('ajout_panier.php', {
+        method: 'POST',
+        body: formData
+      }).then(res => res.text()).then(data => {
+        alert("Produit ajouté au panier avec succès !");
+      }).catch(err => {
+        alert("Erreur lors de l'ajout au panier.");
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
