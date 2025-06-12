@@ -1,10 +1,16 @@
 <?php
-// Traitement de la commande (CheckoutB.php)
 session_start();
-require 'vendor/autoload.php';            // Charger PHPMailer via Composer
+
+// Inclure PHPMailer manuellement
+require 'phpmailer/src/PHPMailer.php';
+require 'phpmailer/src/SMTP.php';
+require 'phpmailer/src/Exception.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-require_once 'config.php';  // Connexion à la base de données
+
+// Connexion à la base de données
+require_once 'config.php';
 
 // Vérifier si le formulaire de checkout a été soumis
 if (isset($_POST['checkout'])) {
@@ -83,6 +89,7 @@ if (isset($_POST['checkout'])) {
 
     // PHPMailer : Envoi d'email avec la facture
     try {
+        // Configuration SMTP
         $mail = new PHPMailer(true);
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
@@ -95,6 +102,7 @@ if (isset($_POST['checkout'])) {
         $mail->setFrom('heloisemarcellinepelagiekackka@gmail.com', 'BHELMAR');
         $mail->addAddress($email_utilisateur);
 
+        // Corps de l'email
         $mail->isHTML(true);
         $mail->Subject = 'Confirmation de votre commande';
         $mail->Body    = sprintf(
@@ -105,13 +113,14 @@ if (isset($_POST['checkout'])) {
         // Ajouter la pièce jointe de la facture PDF
         $mail->addAttachment('facture/'.$pdf_filename);
 
+        // Envoyer l'email
         $mail->send();
         echo 'Votre commande a été envoyée par email avec la facture.';
     } catch (Exception $e) {
-        error_log('PHPMailer Error: ' . $mail->ErrorInfo);
+        echo "Erreur: {$mail->ErrorInfo}";
     }
 
-    // Rediriger l'utilisateur vers une page de confirmation ou un message de succès
+    // Rediriger l'utilisateur vers une page de confirmation
     header('Location: confirmation.php');
 } else {
     echo "Aucune donnée de panier trouvée.";
