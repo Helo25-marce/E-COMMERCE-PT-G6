@@ -1,5 +1,5 @@
 <?php
-// === config.php ===
+// config.php
 $host = 'localhost';
 $dbname = 'gestion_bhelmar';
 $user = 'root';

@@ -1,159 +1,81 @@
 <?php
 session_start();
-require_once 'config.php'; // Connexion à la base de données
+require_once 'config.php';
 
-// Vérifier si l'utilisateur est déjà connecté
 if (isset($_SESSION['admin_id'])) {
-    header('Location: admin_dashboard.php'); // Si connecté, rediriger vers le tableau de bord
+    header("Location: admin_dashboard.php");
     exit;
 }
 
-// Traitement de la connexion
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+$error = "";
 
-    // Vérification dans la base de données
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]); // Exécute la requête avec l'email
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email = trim($_POST["email"]);
+    $password = $_POST["password"];
 
-    $user = $stmt->fetch();
+    $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password, $user['password'])) { // Vérification du mot de passe
-        if ($user['role'] == 'admin') { // Vérification du rôle admin
-            $_SESSION['admin_id'] = $user['id']; // Créer une session pour l'admin
-            header('Location: admin_dashboard.php'); // Redirection vers le tableau de bord admin
-            exit;
+    if ($user) {
+        if (password_verify($password, $user['password'])) {
+            if ($user['role'] === 'admin') {
+                $_SESSION['admin_id'] = $user['id'];
+                header("Location: admin_dashboard.php");
+                exit;
+            } else {
+                $error = "Rôle non autorisé.";
+            }
         } else {
-            $error_message = "Utilisateur non autorisé.";
+            $error = "Mot de passe incorrect.";
         }
     } else {
-        $error_message = "Identifiants incorrects.";
+        $error = "Email introuvable.";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion Admin</title>
-    <style>
-        /* Style général de la page */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        /* Container du formulaire */
-        .container {
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        /* Titre */
-        h2 {
-            color: #2c3e50;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        /* Style pour les messages d'erreur */
-        p {
-            color: #e74c3c;
-            font-size: 14px;
-        }
-
-        /* Champ de formulaire */
-        input[type="email"], input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-
-        input[type="email"]:focus, input[type="password"]:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-
-        /* Bouton de soumission */
-        button {
-            background-color: #3498db;
-            color: #fff;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        /* Bouton de soumission au survol */
-        button:active {
-            background-color: #1abc9c;
-        }
-
-        /* Formulaire avec un léger padding */
-        form {
-            margin-top: 20px;
-        }
-
-        /* Style du lien de redirection */
-        a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Pour les écrans plus petits */
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-                margin: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Connexion Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #ecf0f1;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: white;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Connexion à l'admin</h2>
-        <?php if (isset($error_message)): ?>
-            <p><?php echo $error_message; ?></p>
-        <?php endif; ?>
-        <form method="POST" action="alog.php">
-            <label for="email">Email :</label><br>
-            <input type="email" name="email" required><br><br>
-
-            <label for="password">Mot de passe :</label><br>
-            <input type="password" name="password" required><br><br>
-
-            <button type="submit">Se connecter</button>
-        </form>
+<div class="card">
+  <h4 class="text-center mb-4">Connexion Administrateur</h4>
+  <?php if ($error): ?>
+    <div class="alert alert-danger"><?= $error ?></div>
+  <?php endif; ?>
+  <form method="POST">
+    <div class="mb-3">
+      <input type="email" name="email" class="form-control" placeholder="Email" required>
     </div>
+    <div class="mb-3">
+      <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+  </form>
+</div>
 </body>
 </html>

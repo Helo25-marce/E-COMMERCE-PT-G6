@@ -7,6 +7,7 @@ $lang = $_GET['lang'] ?? ($_SESSION['lang'] ?? 'fr');
 $_SESSION['lang'] = $lang;
 @include_once "lang/{$lang}.php";
 
+
 // État de connexion
 $loggedIn = isset($_SESSION['utilisateur_id']);
 ?>
