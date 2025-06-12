@@ -1,0 +1,118 @@
+<?php
+session_start();
+require_once 'config.php';
+
+if (!isset($_SESSION['livreur_id'])) {
+    header("Location: livreur_login.php");
+    exit;
+}
+
+$livreur_id = $_SESSION['livreur_id'];
+
+$stmt = $pdo->prepare("SELECT * FROM commandes WHERE id_livreur = ?");
+$stmt->execute([$livreur_id]);
+$commandes = $stmt->fetchAll();
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Livraisons</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background: #2ecc71;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📦 Mes Livraisons</h2>
+
+        <?php if (count($commandes) === 0): ?>
+            <p>Aucune livraison trouvée.</p>
+        <?php else: ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Client</th>
+                        <th>Adresse</th>
+                        <th>Statut</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($commandes as $c): ?>
+                        <tr>
+                            <td><?= $c['id_commande'] ?></td>
+                            <td><?= date('d/m/Y', strtotime($c['date_commande'])) ?></td>
+                            <td><?= htmlspecialchars($c['nom_client']) ?? '-' ?></td>
+                            <td><?= htmlspecialchars($c['adresse_livraison']) ?? '-' ?></td>
+                            <td><?= htmlspecialchars($c['statut'] ?? 'En cours') ?></td>
+                            <td><?= number_format($c['total'], 0, ',', ' ') ?> FCFA</td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+        <a class="btn" href="livreur_dashboard.php">⬅ Retour au tableau de bord</a>
+    </div>
+</body>
+</html>

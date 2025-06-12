@@ -1,21 +1,25 @@
 <?php
-require_once 'config.php';
 session_start();
 
-$stmt = $pdo->prepare("SELECT * FROM produits WHERE id_categorie = ?");
-$stmt->execute([1]); // Boulangerie
-$produits = $stmt->fetchAll();
+// Initialisation du panier
+$panier = $_SESSION['panier'] ?? [];
+
+// Calcul du total
+$total = 0;
+foreach ($panier as $item) {
+    $total += $item['quantite'] * $item['prix'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>BHELMAR - Boulangerie</title>
+  <title>Mon Panier - BHELMAR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background: #fffaf0;
+      background: #fdf6e3;
       font-family: 'Segoe UI', sans-serif;
     }
     .navbar {
@@ -34,20 +38,8 @@ $produits = $stmt->fetchAll();
       height: 40px;
       margin-right: 10px;
     }
-    .btn-catalogue, .btn-panier {
-      color: #fff;
-      background: #2d3436;
-      border: none;
-      padding: 6px 15px;
-      border-radius: 5px;
-      text-decoration: none;
-      margin-left: 10px;
-    }
-    .btn-catalogue:hover, .btn-panier:hover {
-      background: #636e72;
-    }
     .btn-retour {
-      margin-top: 30px;
+      margin-top: 20px;
       display: inline-block;
       padding: 10px 20px;
       background-color: #d35400;
@@ -58,41 +50,22 @@ $produits = $stmt->fetchAll();
     .btn-retour:hover {
       background-color: #b84300;
     }
-    .card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-      transition: transform 0.3s ease;
-      position: relative;
+    .table th, .table td {
+      vertical-align: middle;
     }
-    .card:hover {
-      transform: scale(1.03);
+    .total {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: right;
     }
-    .card-img-top {
-      height: 200px;
-      object-fit: cover;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-    }
-    .btn-custom {
-      background-color: #e67e22;
+    .btn-commande {
+      background: #27ae60;
       color: white;
       font-weight: 600;
+      border: none;
     }
-    .btn-custom:hover {
-      background-color: #cf711f;
-    }
-    .badge-promo {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: #f1c40f;
-      color: black;
-      padding: 5px 10px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 13px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    .btn-commande:hover {
+      background: #1e8449;
     }
   </style>
 </head>
@@ -101,75 +74,52 @@ $produits = $stmt->fetchAll();
 <nav class="navbar">
   <a class="navbar-brand" href="#">
     <img src="images.h/logobon.jpg" alt="Logo BHELMAR">
-    BHELMAR - Tous à domicile
+    BHELMAR - Mon Panier
   </a>
-  <a href="categories.php" class="btn-catalogue">&larr; Catalogue</a>
-  <a href="panierB.php" class="btn-panier">🛒 Mon panier</a>
 </nav>
 
-<div class="container mt-4">
-  <h2 class="text-center mb-4">Produits de la Boulangerie</h2>
-  <div class="row" id="liste-produits">
-    <?php if (!empty($produits)): ?>
-      <?php foreach ($produits as $produit): ?>
-        <div class="col-md-4 mb-4">
-          <div class="card">
-            <?php if ($produit['est_promo'] == 1): ?>
-              <div class="badge-promo">Promo</div>
-            <?php endif; ?>
-            <img src="<?= htmlspecialchars($produit['image_url']) ?>" class="card-img-top" alt="<?= htmlspecialchars($produit['nom']) ?>">
-            <div class="card-body">
-              <h5 class="card-title"><?= htmlspecialchars($produit['nom']) ?></h5>
-              <p class="card-text"><?= htmlspecialchars($produit['description']) ?></p>
-              <p><strong><?= number_format($produit['prix'], 0) ?> FCFA</strong> / <?= $produit['unite'] ?></p>
-              <div class="d-flex justify-content-between">
-                <a href="detailB.php?id=<?= $produit['id_produit'] ?>" class="btn btn-outline-secondary btn-sm">Voir détail</a>
-                <button class="btn btn-custom btn-sm ajouter-panier" 
-                        data-id="<?= $produit['id_produit'] ?>"
-                        data-nom="<?= htmlspecialchars($produit['nom']) ?>"
-                        data-prix="<?= $produit['prix'] ?>">
-                        Ajouter au panier
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    <?php else: ?>
-      <div class="col-12 text-center">
-        <p class="text-danger">Aucun produit disponible actuellement dans cette section.</p>
-      </div>
-    <?php endif; ?>
-  </div>
-  <div class="text-center">
-    <a href="categories.php" class="btn-retour">← Retour aux catégories</a>
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">🛒 Mon panier</h2>
+
+  <?php if (!empty($panier)): ?>
+    <table class="table table-bordered table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Image</th>
+          <th>Nom</th>
+          <th>Prix Unitaire</th>
+          <th>Quantité</th>
+          <th>Sous-total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($panier as $item): ?>
+        <tr>
+          <td><img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['nom']) ?>" width="70" height="70"></td>
+          <td><?= htmlspecialchars($item['nom']) ?></td>
+          <td><?= number_format($item['prix'], 0) ?> FCFA</td>
+          <td><?= $item['quantite'] ?></td>
+          <td><strong><?= number_format($item['prix'] * $item['quantite'], 0) ?> FCFA</strong></td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+
+    <p class="total">Total : <?= number_format($total, 0) ?> FCFA</p>
+
+    <div class="d-flex justify-content-end mt-4">
+      <a href="commande.php" class="btn btn-commande me-3">Valider la commande</a>
+    </div>
+  <?php else: ?>
+    <div class="alert alert-warning text-center">
+      Votre panier est vide pour le moment.
+    </div>
+  <?php endif; ?>
+
+  <div class="text-center mt-4">
+    <a href="categories.php" class="btn-retour">← Retour au catalogue</a>
   </div>
 </div>
-
-<script>
-  document.querySelectorAll('.ajouter-panier').forEach(button => {
-    button.addEventListener('click', () => {
-      const id = button.dataset.id;
-      const nom = button.dataset.nom;
-      const prix = button.dataset.prix;
-
-      const formData = new FormData();
-      formData.append('produit_id', id);
-      formData.append('produit_nom', nom);
-      formData.append('produit_prix', prix);
-      formData.append('quantite', 1);
-
-      fetch('ajout_panier.php', {
-        method: 'POST',
-        body: formData
-      }).then(res => res.text()).then(data => {
-        alert("Produit ajouté au panier avec succès !");
-      }).catch(err => {
-        alert("Erreur lors de l'ajout au panier.");
-      });
-    });
-  });
-</script>
 
 </body>
 </html>

@@ -6,6 +6,10 @@ if (isset($_SESSION['admin_id'])) {
     header("Location: admin_dashboard.php");
     exit;
 }
+if (isset($_SESSION['livreur_id'])) {
+    header("Location: livreur_dashboard.php");
+    exit;
+}
 
 $error = "";
 
@@ -13,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
-    $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -23,8 +27,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['admin_id'] = $user['id'];
                 header("Location: admin_dashboard.php");
                 exit;
+            } elseif ($user['role'] === 'livreur') {
+                $_SESSION['livreur_id'] = $user['id'];
+                header("Location: livreur_dashboard.php");
+                exit;
             } else {
-                $error = "Rôle non autorisé.";
+                $error = "Rôle non autorisé à se connecter.";
             }
         } else {
             $error = "Mot de passe incorrect.";
@@ -38,41 +46,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Connexion Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion - BHELMAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background: #ecf0f1;
+      background: #f1f3f5;
       display: flex;
-      height: 100vh;
       justify-content: center;
       align-items: center;
-      margin: 0;
+      height: 100vh;
       font-family: 'Segoe UI', sans-serif;
     }
-    .card {
-      width: 100%;
-      max-width: 400px;
+    .login-card {
+      background: white;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      background: white;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
     }
   </style>
 </head>
 <body>
-<div class="card">
-  <h4 class="text-center mb-4">Connexion Administrateur</h4>
+<div class="login-card">
+  <h4 class="text-center mb-4">Connexion</h4>
   <?php if ($error): ?>
-    <div class="alert alert-danger"><?= $error ?></div>
+    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
   <?php endif; ?>
-  <form method="POST">
+  <form method="POST" autocomplete="off">
     <div class="mb-3">
-      <input type="email" name="email" class="form-control" placeholder="Email" required>
+      <input type="email" name="email" class="form-control" placeholder="Email" autocomplete="off" required>
     </div>
     <div class="mb-3">
-      <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
+      <input type="password" name="password" class="form-control" placeholder="Mot de passe" autocomplete="new-password" required>
     </div>
     <button type="submit" class="btn btn-primary w-100">Se connecter</button>
   </form>
