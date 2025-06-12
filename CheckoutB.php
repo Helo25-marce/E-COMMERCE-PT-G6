@@ -1,7 +1,6 @@
 <?php
-// Traitement de la commande (CheckoutB.php)
 session_start();
-require 'vendor/autoload.php';            // Charger PHPMailer via Composer
+require 'vendor/autoload.php'; // Charger PHPMailer via Composer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require_once 'config.php';  // Connexion à la base de données
@@ -38,15 +37,13 @@ if (isset($_POST['checkout'])) {
     require_once('fpdf/fpdf.php');
     $pdf = new FPDF();
     $pdf->AddPage();
-    
+
     // Ajouter le logo de l'entreprise
-    $pdf->Image('images.h/logobon.jpg', 10, 10, 30);  // Ajuste le chemin et la taille du logo
+    $pdf->Image('images/logo.png', 10, 10, 30);  // Ajuste le chemin et la taille du logo
     $pdf->SetFont('Arial', 'B', 16);
-    $pdf->Cell(200, 10, 'Facture #'.$id_commande, 0, 1, 'C');
     
-      // Ajouter le nom de l'entreprise : BHELMAR - Tous à domicile
-    $pdf->SetFont('Arial', 'B', 16);
-    $pdf->Cell(200, 10, 'BHELMAR - Tous à domicile', 0, 1, 'C'); // Nom de l'entreprise centré
+    // Ajouter le nom de l'entreprise : BHELMAR - Tous à domicile
+    $pdf->Cell(200, 10, 'BHELMAR - Tous à domicile', 0, 1, 'C');
     $pdf->SetFont('Arial', '', 12);
     
     // Ajouter le nom de livraison
@@ -54,19 +51,25 @@ if (isset($_POST['checkout'])) {
 
     $pdf->Ln(10); // Ajouter un espace
 
-
     // Tableau des articles
-    $pdf->Cell(100, 10, 'Article', 1);
+    $pdf->Cell(60, 10, 'Produit', 1);
     $pdf->Cell(30, 10, 'Prix', 1);
-    $pdf->Cell(30, 10, 'Quantite', 1);
+    $pdf->Cell(30, 10, 'Quantité', 1);
     $pdf->Cell(30, 10, 'Total', 1, 1);  // Ligne de titres
 
     foreach ($cart as $item) {
         $itemTotal = $item['price'] * $item['quantity'];
-        $pdf->Cell(100, 10, $item['name'], 1);
+        $pdf->Cell(60, 10, $item['name'], 1);
         $pdf->Cell(30, 10, '$' . number_format($item['price'], 2), 1);
         $pdf->Cell(30, 10, $item['quantity'], 1);
         $pdf->Cell(30, 10, '$' . number_format($itemTotal, 2), 1, 1);  // Ligne de l'article
+
+        // Ajouter l'image du produit (si une image existe dans la table produit)
+        // Exemple : Si une colonne 'image_url' existe dans la base de données
+        $imagePath = 'images/products/' . $item['image']; // Adapte le chemin si nécessaire
+        if (file_exists($imagePath)) {
+            $pdf->Image($imagePath, 10, $pdf->GetY(), 20); // Afficher l'image du produit
+        }
     }
 
     // Ajouter le total général
